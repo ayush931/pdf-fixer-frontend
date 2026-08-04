@@ -4,14 +4,15 @@ import { apiService } from '../../services/apiService';
 import type { PdfPagesInfo } from '../../types/pdf';
 import { Modal } from '../common/Modal';
 import { LoadingSpinner } from '../common/LoadingSpinner';
-import { FileText, Bookmark, Search, Eye, BookOpen, Layers, CheckCircle2 } from 'lucide-react';
+import { FileText, Bookmark, Search, Eye, BookOpen, Layers, CheckCircle2, ListOrdered } from 'lucide-react';
 import { formatFileSize } from '../../utils/formatters';
+import { ReadingOrderMapper } from './ReadingOrderMapper';
 
 export const PdfInspectorModal: React.FC = () => {
   const { selectedFileForInspector, setSelectedFileForInspector } = useApp();
   const [info, setInfo] = useState<PdfPagesInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'outline' | 'search' | 'preview'>('outline');
+  const [activeTab, setActiveTab] = useState<'outline' | 'search' | 'preview' | 'reading-order'>('outline');
   const [searchQuery, setSearchQuery] = useState<string>('index');
   const [filterText, setFilterText] = useState<string>('');
 
@@ -99,6 +100,18 @@ export const PdfInspectorModal: React.FC = () => {
           >
             <Eye className="w-4 h-4" />
             Live Preview
+          </button>
+
+          <button
+            onClick={() => setActiveTab('reading-order')}
+            className={`px-4 py-2 text-xs font-bold rounded-xl flex items-center gap-2 transition-colors ${
+              activeTab === 'reading-order'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'bg-slate-200/80 text-slate-700 hover:text-slate-900 border border-slate-300'
+            }`}
+          >
+            <ListOrdered className="w-4 h-4" />
+            Reading Order Mapping
           </button>
         </div>
 
@@ -223,6 +236,11 @@ export const PdfInspectorModal: React.FC = () => {
                   className="w-full h-full border-none"
                 />
               </div>
+            )}
+
+            {/* READING ORDER MAPPING TAB */}
+            {activeTab === 'reading-order' && (
+              <ReadingOrderMapper file={file} />
             )}
           </>
         )}

@@ -13,10 +13,38 @@ interface TaskLogContentProps {
 }
 
 const TaskLogContent: React.FC<TaskLogContentProps> = ({ initialTask }) => {
-  const { setSelectedTaskForLogs, addToast } = useApp();
+  const { setSelectedTaskForLogs, addToast, refreshTasks, refreshFiles } = useApp();
   const [task, setTask] = useState<Task>(initialTask);
   const [loading, setLoading] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+
+  // Keep state in sync if prop changes
+  React.useEffect(() => {
+    setTask(initialTask);
+  }, [initialTask]);
+
+  // Poll status in real time if task is active
+  React.useEffect(() => {
+    const isRunning = task.status === 'PENDING' || task.status === 'RUNNING' || task.status === 'QUEUED';
+    if (!isRunning) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const updated = await apiService.getTaskStatus(task.id);
+        setTask(updated);
+        
+        // Sync lists when task finishes
+        if (updated.status === 'SUCCESS' || updated.status === 'FAILURE') {
+          refreshTasks();
+          refreshFiles();
+        }
+      } catch (err) {
+        console.error('Failed to poll task logs:', err);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [task.id, task.status, refreshTasks, refreshFiles]);
 
   const handleRefresh = async () => {
     try {

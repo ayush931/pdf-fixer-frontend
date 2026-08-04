@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import type { PdfFile, Task } from '../types/pdf';
+import type { PdfFile, Task, SystemHealth } from '../types/pdf';
 import { apiService } from '../services/apiService';
 import { AppContext, type ToastMessage } from './AppContextInstance';
 
@@ -83,9 +83,40 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [addToast]);
 
+  const [systemHealth, setSystemHealth] = useState<SystemHealth>({
+    status: 'loading',
+    database: '-',
+    redis: '-',
+    celery_workers: '-',
+  });
+
+  const refreshHealth = useCallback(async () => {
+    try {
+      const data = await apiService.getHealth();
+      setSystemHealth(data);
+    } catch (err: unknown) {
+      console.error('Failed to load system health:', err);
+      setSystemHealth({
+        status: 'unhealthy',
+        database: 'Connection Lost',
+        redis: 'Connection Lost',
+        celery_workers: 'Connection Lost',
+      });
+    }
+  }, []);
+
+  // Health polling every 15 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshHealth();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [refreshHealth]);
+
   // Initial load
   useEffect(() => {
     let isMounted = true;
+    refreshHealth();
 
     apiService.getFiles()
       .then((data) => {
@@ -166,6 +197,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         tasks: tasks || [],
         loadingFiles,
         loadingTasks,
+        systemHealth,
         activeFile,
         setActiveFile,
         selectedTaskForLogs,
@@ -181,6 +213,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         removeToast,
         refreshFiles,
         refreshTasks,
+        refreshHealth,
         deleteFile,
         clearAllBackendData,
         triggerTask,

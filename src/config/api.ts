@@ -15,7 +15,10 @@ export const ENDPOINTS = {
   PROCESS_LINK_VIEW: `${API_BASE_URL}/api/process/link-view-settings`,
   PROCESS_FIX_LINKS: `${API_BASE_URL}/api/process/fix-links`,
   PROCESS_BIDIRECTIONAL: `${API_BASE_URL}/api/process/bidirectional-linker`,
+  PROCESS_STRUCTURE_ANALYSIS: `${API_BASE_URL}/api/process/structure-analyzer`,
+  PROCESS_REORDER_READING_ORDER: `${API_BASE_URL}/api/process/reorder-reading-order`,
   
   TASKS: `${API_BASE_URL}/api/tasks`,
   TASK_STATUS: (taskId: string) => `${API_BASE_URL}/api/tasks/${taskId}`,
+  HEALTH: `${API_BASE_URL}/api/health`,
 };

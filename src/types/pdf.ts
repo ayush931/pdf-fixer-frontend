@@ -15,7 +15,9 @@ export type TaskName =
     | 'fix_index_tag'
     | 'apply_link_view_settings'
     | 'fix_links'
-    | 'bidirectional_notes_linker';
+    | 'bidirectional_notes_linker'
+    | 'run_document_structure_analyzer'
+    | 'run_reorder_reading_order';
 
 export type TaskStatus = 'PENDING' | 'QUEUED' | 'RUNNING' | 'SUCCESS' | 'FAILURE';
 
@@ -107,3 +109,53 @@ export interface BidirectionalNotesLinkerRequest {
     verbose?: boolean;
     output_name?: string;
 }
+
+export interface ReorderReadingOrderRequest {
+    file_id: string;
+    custom_order: Record<string, string[]>;
+    output_name?: string;
+}
+
+export interface PageElement {
+    id: string;
+    type: 'Heading' | 'Paragraph' | 'Table' | 'Figure';
+    subtype?: string | null;
+    bbox: [number, number, number, number];
+    text: string;
+    font_name?: string;
+    font_size?: number;
+    reading_order: number;
+}
+
+export interface PageStructure {
+    page: number;
+    width: number;
+    height: number;
+    column_layout: string;
+    figures_count: number;
+    tables_count: number;
+    elements: PageElement[];
+}
+
+export interface DocumentStructureReport {
+    summary: {
+        total_pages: number;
+        total_elements: number;
+        total_headings: number;
+        total_paragraphs: number;
+        total_figures: number;
+        total_tables: number;
+    };
+    pages: PageStructure[];
+}
+
+export interface SystemHealth {
+    status: 'healthy' | 'degraded' | 'unhealthy' | 'loading';
+    database: string;
+    redis: string;
+    celery_workers: string;
+    details?: {
+        workers?: string[];
+    };
+}
+

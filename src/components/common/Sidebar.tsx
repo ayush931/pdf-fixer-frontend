@@ -1,10 +1,10 @@
 import React from 'react';
 import { useApp } from '../../context/useApp';
-import { Files, Wrench, Terminal, FileText, CheckCircle2, Eye, UploadCloud, AlertCircle } from 'lucide-react';
+import { Files, Wrench, Terminal, FileText, CheckCircle2, Eye, UploadCloud, AlertCircle, Activity, Database, Network } from 'lucide-react';
 import { formatFileSize } from '../../utils/formatters';
 
 export const Sidebar: React.FC = () => {
-  const { activeTab, setActiveTab, files, tasks, activeFile, setSelectedFileForInspector } = useApp();
+  const { activeTab, setActiveTab, files, tasks, activeFile, setSelectedFileForInspector, systemHealth } = useApp();
 
   const pendingCount = tasks.filter(
     (t) => t.status === 'PENDING' || t.status === 'RUNNING' || t.status === 'QUEUED'
@@ -129,6 +129,78 @@ export const Sidebar: React.FC = () => {
             </button>
           </div>
         )}
+      </div>
+
+      {/* System Status Panel */}
+      <div className="pt-4 mt-4 border-t border-slate-300/80 space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <Activity className="w-3.5 h-3.5 text-indigo-600" /> System Status
+          </span>
+          <span className="flex items-center gap-1">
+            <span className={`w-2 h-2 rounded-full ${
+              systemHealth.status === 'healthy'
+                ? 'bg-emerald-500 animate-pulse'
+                : systemHealth.status === 'degraded'
+                ? 'bg-amber-500 animate-pulse'
+                : 'bg-rose-500 animate-pulse'
+            }`} />
+            <span className="text-[10px] font-bold text-slate-600 capitalize">
+              {systemHealth.status}
+            </span>
+          </span>
+        </div>
+
+        <div className="p-3 rounded-xl bg-white border border-slate-300 space-y-2 text-[11px] shadow-2xs">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-500 flex items-center gap-1">
+              <Database className="w-3.5 h-3.5 text-slate-400 shrink-0" /> Database
+            </span>
+            <span className={`font-bold ${
+              systemHealth.database.startsWith('online') ? 'text-emerald-600' : 'text-rose-600'
+            }`}>
+              {systemHealth.database.startsWith('online') ? 'Online' : 'Offline'}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-slate-500 flex items-center gap-1">
+              <Network className="w-3.5 h-3.5 text-slate-400 shrink-0" /> Message Broker
+            </span>
+            {systemHealth.redis.startsWith('online') ? (
+              <a 
+                href="http://localhost:15672" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="font-bold text-emerald-600 hover:underline flex items-center gap-0.5"
+                title="Open RabbitMQ Management Console"
+              >
+                Online <span className="text-[9px]">↗</span>
+              </a>
+            ) : (
+              <span className="font-bold text-rose-600">Offline</span>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-slate-500 flex items-center gap-1">
+              <Terminal className="w-3.5 h-3.5 text-slate-400 shrink-0" /> Celery Workers
+            </span>
+            <span className={`font-bold ${
+              systemHealth.celery_workers.startsWith('online') 
+                ? 'text-emerald-600' 
+                : systemHealth.celery_workers.includes('no active workers')
+                ? 'text-amber-500 font-bold animate-pulse'
+                : 'text-rose-600'
+            }`} title={systemHealth.celery_workers}>
+              {systemHealth.celery_workers.startsWith('online') 
+                ? 'Online' 
+                : systemHealth.celery_workers.includes('no active workers')
+                ? 'No Workers'
+                : 'Offline'}
+            </span>
+          </div>
+        </div>
       </div>
     </aside>
   );

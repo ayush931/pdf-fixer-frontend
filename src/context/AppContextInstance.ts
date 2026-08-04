@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { PdfFile, Task } from '../types/pdf';
+import type { PdfFile, Task, SystemHealth } from '../types/pdf';
 
 export interface ToastMessage {
   id: string;
@@ -13,6 +13,7 @@ export interface AppContextType {
   tasks: Task[];
   loadingFiles: boolean;
   loadingTasks: boolean;
+  systemHealth: SystemHealth;
   activeFile: PdfFile | null;
   setActiveFile: (file: PdfFile | null) => void;
   selectedTaskForLogs: Task | null;
@@ -28,6 +29,7 @@ export interface AppContextType {
   removeToast: (id: string) => void;
   refreshFiles: () => Promise<void>;
   refreshTasks: () => Promise<void>;
+  refreshHealth: () => Promise<void>;
   deleteFile: (fileId: string) => Promise<void>;
   clearAllBackendData: () => Promise<void>;
   triggerTask: (taskPromise: Promise<{ task_id: string }>, toolName: string) => Promise<void>;

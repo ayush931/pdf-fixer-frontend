@@ -11,6 +11,8 @@ import type {
   ApplyLinkViewRequest,
   FixLinksRequest,
   BidirectionalNotesLinkerRequest,
+  ReorderReadingOrderRequest,
+  SystemHealth,
 } from '../types/pdf';
 
 class ApiService {
@@ -158,6 +160,24 @@ class ApiService {
     return this.handleResponse<TaskEnqueueResponse>(res);
   }
 
+  async processStructureAnalysis(fileId: string): Promise<TaskEnqueueResponse> {
+    const res = await fetch(ENDPOINTS.PROCESS_STRUCTURE_ANALYSIS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_id: fileId }),
+    });
+    return this.handleResponse<TaskEnqueueResponse>(res);
+  }
+
+  async processReorderReadingOrder(req: ReorderReadingOrderRequest): Promise<TaskEnqueueResponse> {
+    const res = await fetch(ENDPOINTS.PROCESS_REORDER_READING_ORDER, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    });
+    return this.handleResponse<TaskEnqueueResponse>(res);
+  }
+
   // Tasks
   async getTasks(): Promise<Task[]> {
     const res = await fetch(ENDPOINTS.TASKS);
@@ -167,6 +187,11 @@ class ApiService {
   async getTaskStatus(taskId: string): Promise<Task> {
     const res = await fetch(ENDPOINTS.TASK_STATUS(taskId));
     return this.handleResponse<Task>(res);
+  }
+
+  async getHealth(): Promise<SystemHealth> {
+    const res = await fetch(ENDPOINTS.HEALTH);
+    return this.handleResponse<SystemHealth>(res);
   }
 }
 
