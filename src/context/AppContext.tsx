@@ -170,10 +170,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           refreshFiles();
           addToast('success', 'Task Completed', 'PDF processing finished successfully.');
         }
+
+        const prevFailedCount = (tasks || []).filter((t) => t.status === 'FAILURE').length;
+        const nowFailedCount = validTasks.filter((t) => t.status === 'FAILURE').length;
+        if (nowFailedCount > prevFailedCount) {
+          const latestFailed = validTasks.find((t) => t.status === 'FAILURE');
+          addToast('error', 'Task Failed', latestFailed?.error || 'PDF processing encountered an error.');
+        }
       } catch (e) {
         console.error('Polling error:', e);
       }
-    }, 2500);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [tasks, refreshFiles, addToast]);
