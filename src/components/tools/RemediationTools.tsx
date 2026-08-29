@@ -351,52 +351,52 @@ export const RemediationTools: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Mode & Target File Selector Bar */}
-      <div className="p-4 rounded-2xl bg-slate-100/90 border border-slate-300 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-xs">
+      <div className="p-4 rounded-xl bg-white border border-slate-200/80 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 shadow-2xs">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200">
+          <div className="p-2.5 rounded-lg bg-slate-100 text-slate-700">
             <FileText className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-xs uppercase tracking-wider font-bold text-slate-500">
-              Target Document
+            <h3 className="text-[10px] uppercase tracking-wider font-bold text-slate-400">
+              Active PDF for Remediation
             </h3>
             {activeFile ? (
-              <p className="text-sm font-bold text-slate-900">{activeFile.filename}</p>
+              <p className="text-sm font-bold text-slate-900 truncate max-w-xs sm:max-w-md">{activeFile.filename}</p>
             ) : (
-              <p className="text-sm font-semibold text-amber-700 flex items-center gap-1">
-                <AlertCircle className="w-4 h-4" /> Please select a PDF file first
+              <p className="text-xs font-semibold text-rose-600 flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" /> Please select a PDF file first
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
           {/* Single vs Multi-Tool Mode Toggle */}
-          <div className="flex items-center bg-slate-200/80 p-1 rounded-xl border border-slate-300 text-xs">
+          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
             <button
               type="button"
               onClick={() => setMode('single')}
-              className={`px-3 py-1.5 font-bold rounded-lg transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1 font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
                 mode === 'single'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Single Tool Mode
+              Single Tool
             </button>
             <button
               type="button"
               onClick={() => setMode('multi')}
-              className={`px-3 py-1.5 font-bold rounded-lg transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1 font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
                 mode === 'multi'
-                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>Multi-Tool Batch Mode</span>
+              <span>Multi-Tool Batch</span>
             </button>
           </div>
 
@@ -411,7 +411,7 @@ export const RemediationTools: React.FC = () => {
                 setOutputName(`${base}${selectedSingleTool.outputSuffix}`);
               }
             }}
-            className="px-4 py-2 text-xs font-semibold bg-slate-200/60 border border-slate-300 rounded-xl text-slate-800 focus:outline-none focus:border-indigo-500"
+            className="px-3 py-1.5 text-xs font-medium bg-white border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 shadow-2xs"
           >
             {files.map((f) => (
               <option key={f.id} value={f.id}>
@@ -424,7 +424,7 @@ export const RemediationTools: React.FC = () => {
 
       {/* Category Filter Tabs */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-        <div className="flex items-center gap-1 text-slate-500 font-bold px-2 shrink-0">
+        <div className="flex items-center gap-1 text-slate-400 font-semibold px-1 shrink-0">
           <Filter className="w-3.5 h-3.5 text-slate-400" /> Filter:
         </div>
         {CATEGORIES.map((cat) => (
@@ -432,10 +432,10 @@ export const RemediationTools: React.FC = () => {
             key={cat}
             type="button"
             onClick={() => setSelectedCategory(cat)}
-            className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-colors ${
+            className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-colors ${
               selectedCategory === cat
-                ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'bg-slate-200/70 hover:bg-slate-300 text-slate-700 border border-slate-300'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-white hover:bg-slate-50 text-slate-600 border border-slate-200'
             }`}
           >
             {cat} {cat === 'All' ? `(${TOOLS.length})` : ''}
@@ -445,19 +445,19 @@ export const RemediationTools: React.FC = () => {
 
       {/* Multi-Tool Batch Mode Banner */}
       {mode === 'multi' && (
-        <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-between gap-4 text-indigo-900">
+        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-4 text-slate-800 text-xs">
           <div className="flex items-center gap-3">
-            <Sparkles className="w-5 h-5 text-indigo-600 shrink-0" />
+            <Sparkles className="w-4 h-4 text-orange-600 shrink-0" />
             <div>
-              <h4 className="text-xs font-bold text-indigo-950 uppercase tracking-wider">
-                Multi-Tool Batch Suite Enabled
+              <h4 className="font-bold text-slate-900">
+                Multi-Tool Batch Orchestration
               </h4>
-              <p className="text-xs text-indigo-800 mt-0.5">
-                Check multiple tools below to execute them all concurrently in parallel background queues.
+              <p className="text-slate-500 mt-0.5">
+                Check multiple remediation engines below to execute them concurrently in parallel Celery workers.
               </p>
             </div>
           </div>
-          <span className="px-3 py-1 font-bold text-xs rounded-full bg-indigo-600 text-white shadow-2xs shrink-0">
+          <span className="px-2.5 py-1 font-semibold text-xs rounded-lg bg-slate-900 text-white shadow-xs shrink-0">
             {selectedMultiToolIds.length} Selected
           </span>
         </div>
@@ -480,20 +480,20 @@ export const RemediationTools: React.FC = () => {
                   toggleMultiTool(tool.id);
                 }
               }}
-              className={`p-4 rounded-2xl text-left border transition-all duration-200 relative cursor-pointer flex flex-col justify-between ${
+              className={`p-4 rounded-xl text-left border transition-all duration-150 relative cursor-pointer flex flex-col justify-between ${
                 isSelected
-                  ? 'bg-indigo-50/80 border-indigo-400 shadow-md shadow-indigo-500/10'
-                  : 'bg-slate-100/90 hover:bg-slate-200/60 border-slate-300'
+                  ? 'bg-white border-2 border-orange-500 ring-2 ring-orange-500/10 shadow-xs'
+                  : 'bg-white hover:border-slate-300 border-slate-200/80 shadow-2xs'
               }`}
             >
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-2.5">
                   <div
-                    className={`p-2 rounded-xl ${
-                      isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600'
+                    className={`p-2 rounded-lg transition-colors ${
+                      isSelected ? 'bg-orange-50 text-orange-600 border border-orange-200' : 'bg-slate-100 text-slate-600'
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon className="w-4 h-4" />
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -502,22 +502,22 @@ export const RemediationTools: React.FC = () => {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleMultiTool(tool.id)}
-                        className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                        className="w-3.5 h-3.5 rounded text-orange-600 focus:ring-orange-500 cursor-pointer accent-orange-600"
                         onClick={(e) => e.stopPropagation()}
                       />
                     )}
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600 border border-slate-300">
+                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
                       {tool.category.split(' ')[0]}
                     </span>
                   </div>
                 </div>
-                <h4 className="text-sm font-bold text-slate-900">{tool.name}</h4>
-                <p className="text-xs text-slate-600 mt-1 line-clamp-2">{tool.description}</p>
+                <h4 className="text-xs font-bold text-slate-900">{tool.name}</h4>
+                <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">{tool.description}</p>
               </div>
 
               {isSelected && (
-                <div className="mt-3 pt-2 border-t border-indigo-200 flex items-center gap-1 text-[11px] font-bold text-indigo-700">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600" />
+                <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center gap-1 text-[11px] font-semibold text-orange-600">
+                  <CheckCircle2 className="w-3 h-3 text-orange-600" />
                   <span>{mode === 'single' ? 'Active Tool' : 'Included in Batch'}</span>
                 </div>
               )}
@@ -530,27 +530,27 @@ export const RemediationTools: React.FC = () => {
       {activeFile && (
         <form
           onSubmit={handleRunTools}
-          className="p-6 rounded-2xl bg-slate-100/90 border border-slate-300 space-y-6 shadow-md"
+          className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200/80 space-y-5 shadow-2xs"
         >
-          <div className="flex items-center justify-between border-b border-slate-300 pb-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-indigo-600 text-white shadow-xs">
+              <div className="p-2.5 rounded-xl bg-slate-900 text-white shadow-xs">
                 {mode === 'single' ? (
-                  <selectedSingleTool.icon className="w-6 h-6" />
+                  <selectedSingleTool.icon className="w-5 h-5" />
                 ) : (
-                  <Layers className="w-6 h-6" />
+                  <Layers className="w-5 h-5" />
                 )}
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-sm sm:text-base font-bold text-slate-900">
                   {mode === 'single'
                     ? selectedSingleTool.name
                     : `Batch Execution Suite (${selectedMultiToolIds.length} Tools Selected)`}
                 </h3>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-slate-500">
                   {mode === 'single'
                     ? selectedSingleTool.description
-                    : 'Configure settings for all selected tools below and execute simultaneously.'}
+                    : 'Configure parameters for selected remediation engines and execute concurrently.'}
                 </p>
               </div>
             </div>
@@ -559,13 +559,13 @@ export const RemediationTools: React.FC = () => {
           {/* Single Mode Output Name */}
           {mode === 'single' && selectedSingleTool.id !== 'tag_viewer' && selectedSingleTool.id !== 'structure_analyzer' && (
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Output PDF Filename</label>
+              <label className="text-xs font-semibold text-slate-700">Output PDF Filename</label>
               <input
                 type="text"
                 value={effectiveOutputName}
                 onChange={(e) => setOutputName(e.target.value)}
                 placeholder="e.g. remediated_document.pdf"
-                className="w-full px-4 py-2.5 text-xs bg-slate-200/50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 font-mono font-medium"
                 required
               />
             </div>
@@ -573,18 +573,18 @@ export const RemediationTools: React.FC = () => {
 
           {/* Config Section: Fix Index Tag */}
           {(mode === 'single' ? activeToolId === 'fix_index_tag' : selectedMultiToolIds.includes('fix_index_tag')) && (
-            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-2">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
               <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <BookOpenCheck className="w-4 h-4 text-indigo-600" />
+                <BookOpenCheck className="w-4 h-4 text-slate-700" />
                 Fix Index Pages Tagging Settings
-                <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
+                <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
               </label>
               <input
                 type="text"
                 value={indexPages}
                 onChange={(e) => setIndexPages(e.target.value)}
                 placeholder="e.g. 6, 7, 8 (or leave empty for all pages)"
-                className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 font-mono font-medium"
               />
               <p className="text-[11px] text-slate-500">
                 1-indexed comma-separated list of page numbers to fix index links (e.g. 6, 7, 8).
@@ -594,38 +594,38 @@ export const RemediationTools: React.FC = () => {
 
           {/* Config Section: Tag Index Phrases */}
           {(mode === 'single' ? activeToolId === 'tag_index_phrases' : selectedMultiToolIds.includes('tag_index_phrases')) && (
-            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-2">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
               <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <FileType className="w-4 h-4 text-indigo-600" />
-                Tag Index Phrases (Robust Multi-Column Mode)
+                <FileType className="w-4 h-4 text-slate-700" />
+                Tag Index Phrases (Multi-Column Mode)
               </label>
               <input
                 type="text"
                 value={phraseIndexPages}
                 onChange={(e) => setPhraseIndexPages(e.target.value)}
                 placeholder="e.g. 215, 216, 217 (or leave blank to process all pages)"
-                className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 font-mono font-medium"
               />
               <p className="text-[11px] text-slate-500">
-                Keeps phrases ("data - base", "hello, world") unified in a single tag while creating distinct link tags for numbers.
+                Keeps phrases unified in a single tag while creating distinct link tags for page numbers.
               </p>
             </div>
           )}
 
           {/* Config Section: Link View Settings */}
           {(mode === 'single' ? activeToolId === 'apply_link_view_settings' : selectedMultiToolIds.includes('apply_link_view_settings')) && (
-            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-3">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
               <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <ZoomIn className="w-4 h-4 text-indigo-600" />
+                <ZoomIn className="w-4 h-4 text-slate-700" />
                 Link View & Zoom Settings
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">View Preset</label>
+                  <label className="text-xs font-semibold text-slate-700">View Preset</label>
                   <select
                     value={viewPreset}
                     onChange={(e) => setViewPreset(e.target.value as LinkViewSetting)}
-                    className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-medium"
+                    className="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 font-medium"
                   >
                     <option value="Fit">Fit (Fit page to window)</option>
                     <option value="FitH">FitH (Fit width to window)</option>
@@ -635,7 +635,7 @@ export const RemediationTools: React.FC = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">
+                  <label className="text-xs font-semibold text-slate-700">
                     Custom PDF View Command (Optional)
                   </label>
                   <input
@@ -643,7 +643,7 @@ export const RemediationTools: React.FC = () => {
                     value={customView}
                     onChange={(e) => setCustomView(e.target.value)}
                     placeholder="e.g. /XYZ null null null"
-                    className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 font-mono font-medium"
                   />
                 </div>
               </div>
@@ -652,14 +652,14 @@ export const RemediationTools: React.FC = () => {
 
           {/* Config Section: Bidirectional Notes Linker */}
           {(mode === 'single' ? activeToolId === 'bidirectional_notes_linker' : selectedMultiToolIds.includes('bidirectional_notes_linker')) && (
-            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-4">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
               <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <GitCompare className="w-4 h-4 text-indigo-600" />
+                <GitCompare className="w-4 h-4 text-slate-700" />
                 Bidirectional Notes Linker Settings
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">
+                  <label className="text-xs font-semibold text-slate-700">
                     Notes Page Range (Optional)
                   </label>
                   <input
@@ -667,12 +667,12 @@ export const RemediationTools: React.FC = () => {
                     value={notesPages}
                     onChange={(e) => setNotesPages(e.target.value)}
                     placeholder="e.g. 280-310"
-                    className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 font-mono font-medium"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">
+                  <label className="text-xs font-semibold text-slate-700">
                     Note Anchor Regex Pattern (Optional)
                   </label>
                   <input
@@ -680,48 +680,48 @@ export const RemediationTools: React.FC = () => {
                     value={notePattern}
                     onChange={(e) => setNotePattern(e.target.value)}
                     placeholder="e.g. \[(\d+)\]"
-                    className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 font-mono font-medium"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-1">
-                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 pt-1">
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={chapterNotes}
                     onChange={(e) => setChapterNotes(e.target.checked)}
-                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                    className="rounded text-orange-600 focus:ring-orange-500 accent-orange-600"
                   />
                   Chapter Notes Mode
                 </label>
 
-                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer">
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={bookNotes}
                     onChange={(e) => setBookNotes(e.target.checked)}
-                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                    className="rounded text-orange-600 focus:ring-orange-500 accent-orange-600"
                   />
                   Book Notes Mode
                 </label>
 
-                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer">
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={dryRun}
                     onChange={(e) => setDryRun(e.target.checked)}
-                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                    className="rounded text-orange-600 focus:ring-orange-500 accent-orange-600"
                   />
                   Dry Run (Report Only)
                 </label>
 
-                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer">
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={verbose}
                     onChange={(e) => setVerbose(e.target.checked)}
-                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                    className="rounded text-orange-600 focus:ring-orange-500 accent-orange-600"
                   />
                   Verbose Task Logs
                 </label>
@@ -731,86 +731,86 @@ export const RemediationTools: React.FC = () => {
 
           {/* Config Section: Audit & Strip Structure /IDs */}
           {(mode === 'single' ? activeToolId === 'id_remover_strip' : selectedMultiToolIds.includes('id_remover_strip')) && (
-            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-300 pb-3">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-200 pb-2.5">
                 <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <ShieldAlert className="w-4 h-4 text-indigo-600" />
+                  <ShieldAlert className="w-4 h-4 text-slate-700" />
                   Structure /ID Stripping & Audit Options
                 </h4>
                 <button
                   type="button"
                   onClick={handleRunIdInspect}
                   disabled={inspectingIds}
-                  className="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors flex items-center gap-1.5 disabled:opacity-50 shadow-2xs"
                   title="Scan PDF and inventory all /ID shapes into a structured JSON report"
                 >
                   <Search className="w-3.5 h-3.5" />
-                  <span>{inspectingIds ? 'Auditing /IDs...' : 'Run Audit Discovery (Inspect)'}</span>
+                  <span>{inspectingIds ? 'Auditing /IDs...' : 'Run Audit Discovery'}</span>
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Matching Regex Pattern</label>
+                  <label className="text-xs font-semibold text-slate-700">Matching Regex Pattern</label>
                   <input
                     type="text"
                     value={idStripPattern}
                     onChange={(e) => setIdStripPattern(e.target.value)}
                     placeholder="e.g. ^[A-Za-z0-9]+-[A-Za-z0-9.-]+$"
-                    className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 font-mono font-medium"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Tag Type Filter</label>
+                  <label className="text-xs font-semibold text-slate-700">Tag Type Filter</label>
                   <input
                     type="text"
                     value={idStripTagFilter}
                     onChange={(e) => setIdStripTagFilter(e.target.value)}
                     placeholder="e.g. Link,P"
-                    className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 font-mono font-medium"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Cluster Indices (Optional)</label>
+                  <label className="text-xs font-semibold text-slate-700">Cluster Indices (Optional)</label>
                   <input
                     type="text"
                     value={idStripClusters}
                     onChange={(e) => setIdStripClusters(e.target.value)}
                     placeholder="e.g. 1,2"
-                    className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                    className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 font-mono font-medium"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={idStripAuto}
                     onChange={(e) => setIdStripAuto(e.target.checked)}
-                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                    className="rounded text-orange-600 focus:ring-orange-500 accent-orange-600"
                   />
                   Auto-Clean Mode (Producer Noise)
                 </label>
 
-                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer">
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={idStripPrune}
                     onChange={(e) => setIdStripPrune(e.target.checked)}
-                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                    className="rounded text-orange-600 focus:ring-orange-500 accent-orange-600"
                   />
                   Prune Empty /IDTree Nodes
                 </label>
 
-                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer">
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={idStripDryRun}
                     onChange={(e) => setIdStripDryRun(e.target.checked)}
-                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                    className="rounded text-orange-600 focus:ring-orange-500 accent-orange-600"
                   />
                   Dry Run (Audit Report Only)
                 </label>
@@ -820,40 +820,40 @@ export const RemediationTools: React.FC = () => {
 
           {/* Config Section: Auto-Tagger */}
           {(mode === 'single' ? activeToolId === 'auto_tagger' : selectedMultiToolIds.includes('auto_tagger')) && (
-            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-3">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
               <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <Wand2 className="w-4 h-4 text-indigo-600" />
+                <Wand2 className="w-4 h-4 text-slate-700" />
                 Auto-Tagging (PDF/UA Standard Engine) Settings
               </h4>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-500">
                 Analyzes document heading hierarchy, paragraphs, table cells, lists, and marked content sequences for accessibility compliance.
               </p>
-              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer w-fit">
+              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 cursor-pointer w-fit">
                 <input
                   type="checkbox"
                   checked={autoTaggerVerbose}
                   onChange={(e) => setAutoTaggerVerbose(e.target.checked)}
-                  className="rounded text-indigo-600 focus:ring-indigo-500"
+                  className="rounded text-orange-600 focus:ring-orange-500 accent-orange-600"
                 />
-                Enable Verbose Tagging Diagnostics Logs
+                Enable Diagnostics Logs
               </label>
             </div>
           )}
 
           {/* Config Section: Structure Analyzer */}
           {mode === 'single' && activeToolId === 'structure_analyzer' && (
-            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-3">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
               <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <Layout className="w-4 h-4 text-indigo-600" />
+                <Layout className="w-4 h-4 text-slate-700" />
                 Document Structure & Reading Flow Analyzer
               </h4>
-              <p className="text-xs text-slate-600">
-                You can run structure analysis here or view the interactive visual drag-and-drop mapping directly in the PDF Inspector modal.
+              <p className="text-xs text-slate-500">
+                Extracts heading hierarchies, multi-column flows, and visual blocks. View interactive drag-and-drop mapping in the PDF Inspector modal.
               </p>
               <button
                 type="button"
                 onClick={() => setSelectedFileForInspector(activeFile)}
-                className="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors flex items-center gap-1.5 w-fit"
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors flex items-center gap-1.5 w-fit shadow-2xs"
               >
                 <Sliders className="w-3.5 h-3.5" />
                 <span>Open Visual Reading Order Mapper</span>
@@ -862,19 +862,19 @@ export const RemediationTools: React.FC = () => {
           )}
 
           {/* Action Button */}
-          <div className="pt-4 flex justify-end">
+          <div className="pt-2 flex justify-end">
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-3 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 text-xs font-semibold rounded-xl bg-orange-600 hover:bg-orange-700 text-white shadow-xs transition-all flex items-center gap-2 disabled:opacity-50"
             >
-              <Play className="w-4 h-4 fill-white" />
+              <Play className="w-3.5 h-3.5 fill-white" />
               <span>
                 {submitting
                   ? 'Enqueueing Background Tasks...'
                   : mode === 'single'
-                  ? `Run ${selectedSingleTool.name}`
-                  : `Run Selected (${selectedMultiToolIds.length}) Tools in Parallel`}
+                  ? `Execute ${selectedSingleTool.name}`
+                  : `Execute Selected (${selectedMultiToolIds.length}) Engines`}
               </span>
             </button>
           </div>
@@ -883,3 +883,5 @@ export const RemediationTools: React.FC = () => {
     </div>
   );
 };
+
+

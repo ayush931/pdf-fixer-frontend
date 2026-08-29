@@ -73,22 +73,22 @@ const TaskLogContent: React.FC<TaskLogContentProps> = ({ initialTask }) => {
       maxWidth="4xl"
       title={
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200">
+          <div className="p-2 rounded-lg bg-slate-100 text-slate-700">
             <Terminal className="w-5 h-5" />
           </div>
           <div>
             <h3 className="text-base font-bold text-slate-900">{getTaskLabel(task.name)}</h3>
-            <p className="text-xs text-slate-500 font-mono">Task ID: {task.id}</p>
+            <p className="text-xs text-slate-400 font-mono">Task ID: {task.id}</p>
           </div>
         </div>
       }
     >
       <div className="space-y-4">
         {/* Status Bar */}
-        <div className="p-4 rounded-xl bg-slate-200/60 border border-slate-300 flex flex-wrap items-center justify-between gap-3">
+        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <StatusBadge status={task.status} size="md" />
-            <span className="text-xs text-slate-600 font-mono font-bold">
+            <span className="text-xs text-slate-500 font-mono">
               Created: {formatDate(task.created_at)}
             </span>
           </div>
@@ -96,19 +96,19 @@ const TaskLogContent: React.FC<TaskLogContentProps> = ({ initialTask }) => {
           <div className="flex items-center gap-2">
             <button
               onClick={handleRefresh}
-              className="p-1.5 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors"
+              className="p-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 transition-colors"
               title="Refresh Task Logs"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             </button>
 
             {task.log_output && (
               <button
                 onClick={handleCopyLogs}
-                className="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 border border-slate-300 transition-colors flex items-center gap-1.5"
+                className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors flex items-center gap-1.5"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copied Logs' : 'Copy Logs'}</span>
+                <span>{copied ? 'Copied' : 'Copy Logs'}</span>
               </button>
             )}
 
@@ -117,7 +117,7 @@ const TaskLogContent: React.FC<TaskLogContentProps> = ({ initialTask }) => {
                 <a
                   href={apiService.getDownloadUrl(task.output_file_id)}
                   download={task.output_filename || 'remediated.pdf'}
-                  className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 transition-colors flex items-center gap-1.5 shadow-2xs"
+                  className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-colors flex items-center gap-1.5 shadow-2xs"
                   title="Download output PDF file"
                 >
                   <Download className="w-3.5 h-3.5" />
@@ -133,8 +133,8 @@ const TaskLogContent: React.FC<TaskLogContentProps> = ({ initialTask }) => {
                       refreshTasks();
                     }, 1500);
                   }}
-                  className="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-100 hover:bg-indigo-200 text-indigo-900 border border-indigo-300 transition-colors flex items-center gap-1.5 shadow-2xs"
-                  title="Download and immediately purge from server disk storage"
+                  className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors flex items-center gap-1.5"
+                  title="Download and purge from server storage"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download & Purge</span>
@@ -146,11 +146,11 @@ const TaskLogContent: React.FC<TaskLogContentProps> = ({ initialTask }) => {
 
         {/* Error Alert Box */}
         {task.error && (
-          <div className="p-4 rounded-xl bg-rose-100 border border-rose-300 text-rose-900 text-xs space-y-1">
+          <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-1">
             <h4 className="font-bold flex items-center gap-2 text-rose-800">
               <AlertTriangle className="w-4 h-4" /> Task Failed
             </h4>
-            <p className="font-mono font-semibold">{task.error}</p>
+            <p className="font-mono font-medium">{task.error}</p>
           </div>
         )}
 
@@ -158,15 +158,15 @@ const TaskLogContent: React.FC<TaskLogContentProps> = ({ initialTask }) => {
         <div className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 font-mono text-xs shadow-md">
           <div className="px-4 py-2 bg-slate-900 border-b border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
             <span className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
-              <span className="ml-2 font-bold text-slate-300">STDOUT & STDERR Execution Trace</span>
+              <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" />
+              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+              <span className="ml-1.5 font-bold text-slate-300">Execution Output & Task Logs</span>
             </span>
-            <span className="text-slate-400">UTF-8</span>
+            <span className="text-slate-500 font-mono">UTF-8</span>
           </div>
 
-          <div className="p-4 max-h-[380px] overflow-y-auto space-y-1 text-slate-200 leading-relaxed whitespace-pre-wrap selection:bg-indigo-500 selection:text-white">
+          <div className="p-4 max-h-[380px] overflow-y-auto space-y-1 text-slate-200 leading-relaxed whitespace-pre-wrap selection:bg-orange-600 selection:text-white">
             {loading ? (
               <LoadingSpinner label="Fetching execution logs..." size="sm" />
             ) : task.log_output ? (
@@ -188,3 +188,5 @@ export const TaskLogModal: React.FC = () => {
 
   return <TaskLogContent key={selectedTaskForLogs.id} initialTask={selectedTaskForLogs} />;
 };
+
+

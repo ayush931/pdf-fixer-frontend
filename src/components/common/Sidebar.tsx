@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/useApp';
-import { Files, Wrench, Terminal, FileText, CheckCircle2, Eye, UploadCloud, AlertCircle, Activity, Database, Network } from 'lucide-react';
+import { Files, Wrench, Terminal, FileText, Eye, UploadCloud, Activity, Database, Network } from 'lucide-react';
 import { formatFileSize } from '../../utils/formatters';
 import { TOOLS } from '../tools/RemediationTools';
 
@@ -22,14 +22,14 @@ export const Sidebar: React.FC = () => {
     {
       id: 'tools' as const,
       label: 'Remediation Tools',
-      description: 'Fix links, tags, AI & IDs',
+      description: 'Fix links, tags & IDs',
       icon: Wrench,
       count: TOOLS.length,
     },
     {
       id: 'tasks' as const,
       label: 'Task Queue & Logs',
-      description: 'Celery background workers',
+      description: 'Celery background jobs',
       icon: Terminal,
       count: tasks.length,
       badge: pendingCount > 0 ? pendingCount : null,
@@ -37,15 +37,15 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="hidden md:flex md:flex-col justify-between w-64 h-full bg-slate-200/50 backdrop-blur-md border-r border-slate-300/80 shrink-0 p-4 overflow-y-auto">
-      <div className="space-y-6">
+    <aside className="hidden md:flex md:flex-col justify-between w-64 h-full bg-white border-r border-slate-200/80 shrink-0 p-4 overflow-y-auto">
+      <div className="space-y-5">
         <div className="px-2">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            Navigation Menu
+          <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            Navigation
           </h2>
         </div>
 
-        <nav className="space-y-2">
+        <nav className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -54,23 +54,23 @@ export const Sidebar: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 text-left ${
+                className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all text-left ${
                   isActive
-                    ? 'bg-white text-indigo-950 border border-indigo-200 shadow-md shadow-indigo-500/10 font-bold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 border border-transparent'
+                    ? 'bg-slate-900 text-white font-semibold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent'
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div
-                    className={`p-2 rounded-lg transition-colors ${
-                      isActive ? 'bg-indigo-600 text-white shadow-2xs' : 'bg-slate-200 text-slate-600'
+                    className={`p-1.5 rounded-lg transition-colors ${
+                      isActive ? 'bg-white/15 text-white' : 'bg-slate-100 text-slate-600'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="truncate">
-                    <div className="text-xs font-bold text-slate-900">{item.label}</div>
-                    <div className="text-[11px] text-slate-500 truncate">{item.description}</div>
+                    <div className={`text-xs font-semibold ${isActive ? 'text-white' : 'text-slate-800'}`}>{item.label}</div>
+                    <div className={`text-[10px] truncate ${isActive ? 'text-slate-400' : 'text-slate-500'}`}>{item.description}</div>
                   </div>
                 </div>
 
@@ -79,7 +79,9 @@ export const Sidebar: React.FC = () => {
                     {item.badge}
                   </span>
                 ) : (
-                  <span className="text-[11px] text-slate-600 font-mono px-2 py-0.5 rounded-md bg-slate-200/80 border border-slate-300/60 font-semibold">
+                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-semibold ${
+                    isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600 border border-slate-200'
+                  }`}>
                     {item.count}
                   </span>
                 )}
@@ -90,74 +92,72 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Selected PDF Card Widget */}
-      <div className="pt-6 border-t border-slate-300/80">
+      <div className="pt-4 border-t border-slate-200/80">
         {activeFile ? (
-          <div className="p-3.5 rounded-xl bg-white border border-slate-300 space-y-2.5 shadow-sm">
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600" /> Active PDF
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                Active PDF
               </span>
-              <span className="text-[10px] text-slate-500 font-mono font-bold">{formatFileSize(activeFile.size)}</span>
+              <span className="text-[10px] text-slate-500 font-mono font-medium">{formatFileSize(activeFile.size)}</span>
             </div>
 
             <div className="flex items-center gap-2 min-w-0">
-              <FileText className="w-4 h-4 text-indigo-600 shrink-0" />
-              <p className="text-xs font-bold text-slate-900 truncate" title={activeFile.filename}>
+              <FileText className="w-4 h-4 text-orange-600 shrink-0" />
+              <p className="text-xs font-semibold text-slate-900 truncate" title={activeFile.filename}>
                 {activeFile.filename}
               </p>
             </div>
 
             <button
               onClick={() => setSelectedFileForInspector(activeFile)}
-              className="w-full py-1.5 px-3 text-xs font-bold rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors flex items-center justify-center gap-1.5"
+              className="w-full py-1.5 px-3 text-xs font-semibold rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
             >
-              <Eye className="w-3.5 h-3.5" /> Inspect PDF Structure
+              <Eye className="w-3.5 h-3.5" /> Inspect Structure
             </button>
           </div>
         ) : (
-          <div className="p-3.5 rounded-xl bg-slate-100 border border-slate-300 text-center space-y-2">
-            <div className="flex items-center justify-center gap-1.5 text-amber-700 text-xs font-bold">
-              <AlertCircle className="w-4 h-4" /> No PDF Selected
-            </div>
-            <p className="text-[11px] text-slate-500">
-              Upload or pick a PDF file to run remediation tools.
+          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-center space-y-2">
+            <p className="text-xs font-medium text-slate-600">No PDF Selected</p>
+            <p className="text-[11px] text-slate-400">
+              Upload a document to run remediation tools.
             </p>
             <button
               onClick={() => setActiveTab('files')}
-              className="w-full py-1.5 px-3 text-xs font-bold rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors flex items-center justify-center gap-1.5"
+              className="w-full py-1.5 px-3 text-xs font-semibold rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
             >
-              <UploadCloud className="w-3.5 h-3.5" /> Upload PDF
+              <UploadCloud className="w-3.5 h-3.5" /> Upload File
             </button>
           </div>
         )}
       </div>
 
       {/* System Status Panel */}
-      <div className="pt-4 mt-4 border-t border-slate-300/80 space-y-3">
+      <div className="pt-4 mt-4 border-t border-slate-200/80 space-y-2.5">
         <div className="flex items-center justify-between px-1">
-          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-            <Activity className="w-3.5 h-3.5 text-indigo-600" /> System Status
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <Activity className="w-3.5 h-3.5" /> System Status
           </span>
           <span className="flex items-center gap-1">
-            <span className={`w-2 h-2 rounded-full ${
+            <span className={`w-1.5 h-1.5 rounded-full ${
               systemHealth.status === 'healthy'
-                ? 'bg-emerald-500 animate-pulse'
+                ? 'bg-emerald-500'
                 : systemHealth.status === 'degraded'
-                ? 'bg-amber-500 animate-pulse'
-                : 'bg-rose-500 animate-pulse'
+                ? 'bg-amber-500'
+                : 'bg-rose-500'
             }`} />
-            <span className="text-[10px] font-bold text-slate-600 capitalize">
+            <span className="text-[10px] font-semibold text-slate-600 capitalize">
               {systemHealth.status}
             </span>
           </span>
         </div>
 
-        <div className="p-3 rounded-xl bg-white border border-slate-300 space-y-2 text-[11px] shadow-2xs">
+        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5 text-[11px]">
           <div className="flex items-center justify-between">
             <span className="text-slate-500 flex items-center gap-1">
-              <Database className="w-3.5 h-3.5 text-slate-400 shrink-0" /> Database
+              <Database className="w-3 h-3 text-slate-400 shrink-0" /> Database
             </span>
-            <span className={`font-bold ${
+            <span className={`font-semibold ${
               systemHealth.database.startsWith('online') ? 'text-emerald-600' : 'text-rose-600'
             }`}>
               {systemHealth.database.startsWith('online') ? 'Online' : 'Offline'}
@@ -166,34 +166,26 @@ export const Sidebar: React.FC = () => {
 
           <div className="flex items-center justify-between">
             <span className="text-slate-500 flex items-center gap-1">
-              <Network className="w-3.5 h-3.5 text-slate-400 shrink-0" /> Message Broker
+              <Network className="w-3 h-3 text-slate-400 shrink-0" /> Message Broker
             </span>
-            {systemHealth.redis.startsWith('online') ? (
-              <a 
-                href="http://localhost:15672" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="font-bold text-emerald-600 hover:underline flex items-center gap-0.5"
-                title="Open RabbitMQ Management Console"
-              >
-                Online <span className="text-[9px]">↗</span>
-              </a>
-            ) : (
-              <span className="font-bold text-rose-600">Offline</span>
-            )}
+            <span className={`font-semibold ${
+              systemHealth.redis.startsWith('online') ? 'text-emerald-600' : 'text-rose-600'
+            }`}>
+              {systemHealth.redis.startsWith('online') ? 'Online' : 'Offline'}
+            </span>
           </div>
 
           <div className="flex items-center justify-between">
             <span className="text-slate-500 flex items-center gap-1">
-              <Terminal className="w-3.5 h-3.5 text-slate-400 shrink-0" /> Celery Workers
+              <Terminal className="w-3 h-3 text-slate-400 shrink-0" /> Celery Workers
             </span>
-            <span className={`font-bold ${
+            <span className={`font-semibold ${
               systemHealth.celery_workers.startsWith('online') 
                 ? 'text-emerald-600' 
                 : systemHealth.celery_workers.includes('no active workers')
-                ? 'text-amber-500 font-bold animate-pulse'
+                ? 'text-amber-600'
                 : 'text-rose-600'
-            }`} title={systemHealth.celery_workers}>
+            }`}>
               {systemHealth.celery_workers.startsWith('online') 
                 ? 'Online' 
                 : systemHealth.celery_workers.includes('no active workers')
@@ -206,3 +198,5 @@ export const Sidebar: React.FC = () => {
     </aside>
   );
 };
+
+

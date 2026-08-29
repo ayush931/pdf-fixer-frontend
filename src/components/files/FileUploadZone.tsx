@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useApp } from '../../context/useApp';
 import { apiService } from '../../services/apiService';
-import { UploadCloud, FileCheck2, Loader2 } from 'lucide-react';
+import { UploadCloud, FileCheck2, Loader2, ShieldCheck, CheckCircle } from 'lucide-react';
 
 export const FileUploadZone: React.FC = () => {
   const { refreshFiles, setActiveFile, addToast } = useApp();
@@ -66,10 +66,10 @@ export const FileUploadZone: React.FC = () => {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       onClick={() => !uploading && fileInputRef.current?.click()}
-      className={`relative group cursor-pointer border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center transition-all duration-300 shadow-xs ${
+      className={`relative group cursor-pointer border-2 border-dashed rounded-2xl p-6 sm:p-8 text-center transition-all duration-200 bg-white ${
         isDragging
-          ? 'border-indigo-500 bg-indigo-50/60 scale-[1.01] shadow-lg shadow-indigo-500/10'
-          : 'border-slate-300 hover:border-indigo-400 bg-slate-100/90 hover:bg-slate-200/50'
+          ? 'border-orange-500 bg-orange-50/20 shadow-xs'
+          : 'border-slate-300 hover:border-slate-400 hover:bg-slate-50/50 shadow-2xs'
       }`}
     >
       <input
@@ -82,48 +82,52 @@ export const FileUploadZone: React.FC = () => {
       />
 
       <div className="flex flex-col items-center justify-center space-y-3">
-        <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+        <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center group-hover:scale-105 transition-transform">
           {uploading ? (
-            <Loader2 className="w-7 h-7 animate-spin" />
+            <Loader2 className="w-6 h-6 animate-spin text-orange-600" />
           ) : (
-            <UploadCloud className="w-7 h-7" />
+            <UploadCloud className="w-6 h-6" />
           )}
         </div>
 
         {uploading ? (
           <div className="w-full max-w-xs space-y-2">
-            <div className="flex items-center justify-between text-xs text-slate-700 font-bold">
-              <span>Uploading PDF...</span>
-              <span>{progress}%</span>
+            <div className="flex items-center justify-between text-xs text-slate-800 font-semibold">
+              <span>Uploading & Processing PDF...</span>
+              <span className="text-orange-600 font-mono">{progress}%</span>
             </div>
-            <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-indigo-600 to-cyan-500 transition-all duration-200"
+                className="h-full bg-orange-600 rounded-full transition-all duration-200"
                 style={{ width: `${progress}%` }}
               />
             </div>
           </div>
         ) : (
           <div>
-            <h3 className="text-base font-bold text-slate-900 flex items-center justify-center gap-2">
-              Drop your PDF file here, or <span className="text-indigo-600 underline">Browse</span>
+            <h3 className="text-sm sm:text-base font-bold text-slate-900">
+              Drop your PDF file here, or <span className="text-orange-600 underline underline-offset-2">Browse</span>
             </h3>
-            <p className="text-xs text-slate-600 mt-1">
-              Supports standard PDFs for tags, note IDs, link zoom & footnote remediation
+            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+              Automated tag tree extraction, note IDs validation, broken link repair & accessibility checks.
             </p>
           </div>
         )}
 
-        <div className="flex items-center gap-4 text-[11px] text-slate-500 font-semibold pt-1">
-          <span className="flex items-center gap-1">
-            <FileCheck2 className="w-3.5 h-3.5 text-indigo-600" /> Auto-validated
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+          <span className="inline-flex items-center gap-1 text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200 text-[11px] font-medium">
+            <FileCheck2 className="w-3 h-3 text-slate-500" /> Auto-Validated
           </span>
-          <span>•</span>
-          <span>Fast API Backend</span>
-          <span>•</span>
-          <span>Celery Queues</span>
+          <span className="inline-flex items-center gap-1 text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200 text-[11px] font-medium">
+            <ShieldCheck className="w-3 h-3 text-emerald-600" /> WCAG 2.1 Ready
+          </span>
+          <span className="inline-flex items-center gap-1 text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200 text-[11px] font-medium">
+            <CheckCircle className="w-3 h-3 text-slate-500" /> Section 508
+          </span>
         </div>
       </div>
     </div>
   );
 };
+
+

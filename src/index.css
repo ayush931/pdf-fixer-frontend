@@ -3,51 +3,56 @@
 @layer base {
   :root {
     color-scheme: light;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
   }
   
   body {
-    @apply bg-[#f3f5f8] text-slate-800 font-sans antialiased selection:bg-indigo-500 selection:text-white min-h-screen overflow-x-hidden;
-    background-image: 
-      radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
-      radial-gradient(at 90% 90%, rgba(14, 165, 233, 0.05) 0px, transparent 50%);
-    background-attachment: fixed;
+    font-family: var(--font-sans);
+    @apply bg-[#F8FAFC] text-slate-800 antialiased selection:bg-orange-600 selection:text-white min-h-screen overflow-x-hidden;
+  }
+
+  code, pre, kbd {
+    font-family: var(--font-mono);
   }
 }
 
 /* Custom Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.96); }
+  from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: scale(1); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-scale-up {
-  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Slick Custom Scrollbar for Light Theme */
+/* Clean Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(226, 232, 240, 0.6);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.8);
+  background: rgba(148, 163, 184, 0.4);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.7);
+  background: rgba(100, 116, 139, 0.7);
 }
+
+
