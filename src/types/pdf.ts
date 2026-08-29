@@ -11,19 +11,39 @@ export interface PdfFile {
 
 export type TaskName =
     | 'fix_note_ids'
+    | 'run_fix_note_ids'
+    | 'fix_reference_note_ids'
+    | 'run_fix_reference_note_ids'
     | 'tag_viewer'
+    | 'run_tag_viewer'
     | 'fix_index_tag'
+    | 'run_fix_index_tag'
+    | 'tag_index_phrases'
+    | 'run_tag_index_phrases'
     | 'apply_link_view_settings'
+    | 'run_apply_link_view_settings'
     | 'fix_links'
+    | 'run_fix_links'
     | 'bidirectional_notes_linker'
+    | 'run_bidirectional_notes_linker'
+    | 'remove_page_ids'
+    | 'run_remove_page_ids'
+    | 'id_remover_inspect'
+    | 'run_id_remover_inspect'
+    | 'id_remover_strip'
+    | 'run_id_remover_strip'
+    | 'auto_tagger'
+    | 'run_auto_tagger'
+    | 'document_structure_analyzer'
     | 'run_document_structure_analyzer'
+    | 'reorder_reading_order'
     | 'run_reorder_reading_order';
 
 export type TaskStatus = 'PENDING' | 'QUEUED' | 'RUNNING' | 'SUCCESS' | 'FAILURE';
 
 export interface Task {
     id: string;
-    name: TaskName;
+    name: TaskName | string;
     file_id: string;
     output_file_id?: string | null;
     status: TaskStatus;
@@ -67,10 +87,17 @@ export interface UploadResponse {
 export interface TaskEnqueueResponse {
     task_id: string;
     status: string;
+    info?: string;
+    mode?: string;
 }
 
 // Remediation tool request interfaces
 export interface NoteIdsRequest {
+    file_id: string;
+    output_name?: string;
+}
+
+export interface ReferenceNoteIdsRequest {
     file_id: string;
     output_name?: string;
 }
@@ -81,7 +108,13 @@ export interface TagViewerRequest {
 
 export interface FixIndexTagRequest {
     file_id: string;
-    pages: number[];
+    pages?: number[];
+    output_name?: string;
+}
+
+export interface TagIndexPhrasesRequest {
+    file_id: string;
+    pages?: number[];
     output_name?: string;
 }
 
@@ -108,6 +141,32 @@ export interface BidirectionalNotesLinkerRequest {
     dry_run?: boolean;
     verbose?: boolean;
     output_name?: string;
+}
+
+export interface RemovePageIdsRequest {
+    file_id: string;
+    output_name?: string;
+}
+
+export interface IdRemoverInspectRequest {
+    file_id: string;
+}
+
+export interface IdRemoverStripRequest {
+    file_id: string;
+    output_name?: string;
+    pattern?: string | null;
+    tag_filter?: string | null;
+    clusters?: string | null;
+    auto?: boolean;
+    prune_empty_nodes?: boolean;
+    dry_run?: boolean;
+}
+
+export interface AutoTaggerRequest {
+    file_id: string;
+    output_name?: string;
+    verbose?: boolean;
 }
 
 export interface ReorderReadingOrderRequest {

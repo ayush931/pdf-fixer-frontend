@@ -31,7 +31,7 @@ export const ReadingOrderMapper: React.FC<ReadingOrderMapperProps> = ({ file }) 
 
   // Check if there is an active or completed analyzer task
   const analyzerTask = tasks.find(
-    (t) => t.file_id === file.id && t.name === 'run_document_structure_analyzer'
+    (t) => t.file_id === file.id && (t.name === 'run_document_structure_analyzer' || t.name === 'document_structure_analyzer')
   );
 
   const fetchReport = useCallback(async (outputFileId: string) => {

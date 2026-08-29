@@ -2,6 +2,7 @@ import React from 'react';
 import { useApp } from '../../context/useApp';
 import { Files, Wrench, Terminal, FileText, CheckCircle2, Eye, UploadCloud, AlertCircle, Activity, Database, Network } from 'lucide-react';
 import { formatFileSize } from '../../utils/formatters';
+import { TOOLS } from '../tools/RemediationTools';
 
 export const Sidebar: React.FC = () => {
   const { activeTab, setActiveTab, files, tasks, activeFile, setSelectedFileForInspector, systemHealth } = useApp();
@@ -21,9 +22,9 @@ export const Sidebar: React.FC = () => {
     {
       id: 'tools' as const,
       label: 'Remediation Tools',
-      description: 'Fix links, tags & IDs',
+      description: 'Fix links, tags, AI & IDs',
       icon: Wrench,
-      count: 6,
+      count: TOOLS.length,
     },
     {
       id: 'tasks' as const,

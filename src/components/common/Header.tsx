@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/useApp';
 import { FileCheck2, Cpu, Activity, ExternalLink, Sparkles, RefreshCw, Trash2, Menu, X, Files, Wrench, Terminal } from 'lucide-react';
+import { TOOLS } from '../tools/RemediationTools';
 
 export const Header: React.FC = () => {
   const { tasks, files, refreshFiles, refreshTasks, loadingFiles, loadingTasks, clearAllBackendData, activeTab, setActiveTab } = useApp();
@@ -130,7 +131,7 @@ export const Header: React.FC = () => {
             }`}
           >
             <span className="flex items-center gap-2"><Wrench className="w-4 h-4" /> Remediation Tools</span>
-            <span className="px-2 py-0.5 rounded-full bg-slate-300/60 text-slate-800 font-mono text-[10px]">6 Tools</span>
+            <span className="px-2 py-0.5 rounded-full bg-slate-300/60 text-slate-800 font-mono text-[10px]">{TOOLS.length} Tools</span>
           </button>
 
           <button

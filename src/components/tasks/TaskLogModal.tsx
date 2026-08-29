@@ -113,14 +113,33 @@ const TaskLogContent: React.FC<TaskLogContentProps> = ({ initialTask }) => {
             )}
 
             {task.output_file_id && (
-              <a
-                href={apiService.getDownloadUrl(task.output_file_id)}
-                download={task.output_filename || 'remediated.pdf'}
-                className="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 transition-colors flex items-center gap-1.5 shadow-2xs"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download Output PDF</span>
-              </a>
+              <div className="flex items-center gap-1.5">
+                <a
+                  href={apiService.getDownloadUrl(task.output_file_id)}
+                  download={task.output_filename || 'remediated.pdf'}
+                  className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-900 border border-emerald-300 transition-colors flex items-center gap-1.5 shadow-2xs"
+                  title="Download output PDF file"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download PDF</span>
+                </a>
+
+                <a
+                  href={apiService.getDownloadUrl(task.output_file_id, true)}
+                  download={task.output_filename || 'remediated.pdf'}
+                  onClick={() => {
+                    setTimeout(() => {
+                      refreshFiles();
+                      refreshTasks();
+                    }, 1500);
+                  }}
+                  className="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-100 hover:bg-indigo-200 text-indigo-900 border border-indigo-300 transition-colors flex items-center gap-1.5 shadow-2xs"
+                  title="Download and immediately purge from server disk storage"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download & Purge</span>
+                </a>
+              </div>
             )}
           </div>
         </div>

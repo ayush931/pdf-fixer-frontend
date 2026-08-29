@@ -6,11 +6,17 @@ import type {
   UploadResponse,
   TaskEnqueueResponse,
   NoteIdsRequest,
+  ReferenceNoteIdsRequest,
   TagViewerRequest,
   FixIndexTagRequest,
+  TagIndexPhrasesRequest,
   ApplyLinkViewRequest,
   FixLinksRequest,
   BidirectionalNotesLinkerRequest,
+  RemovePageIdsRequest,
+  IdRemoverInspectRequest,
+  IdRemoverStripRequest,
+  AutoTaggerRequest,
   ReorderReadingOrderRequest,
   SystemHealth,
 } from '../types/pdf';
@@ -96,8 +102,17 @@ class ApiService {
     return this.handleResponse<PdfPagesInfo>(res);
   }
 
-  getDownloadUrl(fileId: string): string {
-    return ENDPOINTS.DOWNLOAD(fileId);
+  getDownloadUrl(fileId: string, deleteAfter: boolean = false): string {
+    return ENDPOINTS.DOWNLOAD(fileId, deleteAfter);
+  }
+
+  async cleanupStorage(fileId?: string): Promise<{ status: string; message: string; purged_count?: number }> {
+    const res = await fetch(ENDPOINTS.CLEANUP, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fileId ? { file_id: fileId } : { purge_all: true }),
+    });
+    return this.handleResponse<{ status: string; message: string; purged_count?: number }>(res);
   }
 
   async clearAllData(): Promise<{ status: string; message: string }> {
@@ -108,6 +123,15 @@ class ApiService {
   // Remediation Tools Process Endpoints
   async processNoteIds(req: NoteIdsRequest): Promise<TaskEnqueueResponse> {
     const res = await fetch(ENDPOINTS.PROCESS_NOTE_IDS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    });
+    return this.handleResponse<TaskEnqueueResponse>(res);
+  }
+
+  async processReferenceNoteIds(req: ReferenceNoteIdsRequest): Promise<TaskEnqueueResponse> {
+    const res = await fetch(ENDPOINTS.PROCESS_REFERENCE_NOTE_IDS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req),
@@ -126,6 +150,15 @@ class ApiService {
 
   async processIndexTags(req: FixIndexTagRequest): Promise<TaskEnqueueResponse> {
     const res = await fetch(ENDPOINTS.PROCESS_INDEX_TAGS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    });
+    return this.handleResponse<TaskEnqueueResponse>(res);
+  }
+
+  async processTagIndexPhrases(req: TagIndexPhrasesRequest): Promise<TaskEnqueueResponse> {
+    const res = await fetch(ENDPOINTS.PROCESS_TAG_INDEX_PHRASES, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req),
@@ -153,6 +186,42 @@ class ApiService {
 
   async processBidirectional(req: BidirectionalNotesLinkerRequest): Promise<TaskEnqueueResponse> {
     const res = await fetch(ENDPOINTS.PROCESS_BIDIRECTIONAL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    });
+    return this.handleResponse<TaskEnqueueResponse>(res);
+  }
+
+  async processRemovePageIds(req: RemovePageIdsRequest): Promise<TaskEnqueueResponse> {
+    const res = await fetch(ENDPOINTS.PROCESS_REMOVE_PAGE_IDS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    });
+    return this.handleResponse<TaskEnqueueResponse>(res);
+  }
+
+  async processIdRemoverInspect(req: IdRemoverInspectRequest): Promise<TaskEnqueueResponse> {
+    const res = await fetch(ENDPOINTS.PROCESS_ID_REMOVER_INSPECT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    });
+    return this.handleResponse<TaskEnqueueResponse>(res);
+  }
+
+  async processIdRemoverStrip(req: IdRemoverStripRequest): Promise<TaskEnqueueResponse> {
+    const res = await fetch(ENDPOINTS.PROCESS_ID_REMOVER_STRIP, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
+    });
+    return this.handleResponse<TaskEnqueueResponse>(res);
+  }
+
+  async processAutoTagger(req: AutoTaggerRequest): Promise<TaskEnqueueResponse> {
+    const res = await fetch(ENDPOINTS.PROCESS_AUTO_TAGGER, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req),

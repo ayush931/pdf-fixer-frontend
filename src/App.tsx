@@ -7,7 +7,7 @@ import { ToastStack } from './components/common/Toast';
 import { FileUploadZone } from './components/files/FileUploadZone';
 import { FileListTable } from './components/files/FileListTable';
 import { PdfInspectorModal } from './components/files/PdfInspectorModal';
-import { RemediationTools } from './components/tools/RemediationTools';
+import { RemediationTools, TOOLS } from './components/tools/RemediationTools';
 import { TaskMonitor } from './components/tasks/TaskMonitor';
 import { TaskLogModal } from './components/tasks/TaskLogModal';
 import { Files, Wrench, Terminal, ShieldCheck, Zap, FileCheck } from 'lucide-react';
@@ -39,8 +39,8 @@ const MainContent: React.FC = () => {
         <div className="p-4 rounded-2xl bg-slate-100/90 border border-slate-300 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-slate-500">Remediation Tools</p>
-            <p className="text-2xl font-black text-indigo-700 mt-1">6 Active</p>
-            <p className="text-[11px] text-slate-500 mt-0.5 font-mono">Tags, Links & IDs</p>
+            <p className="text-2xl font-black text-indigo-700 mt-1">{TOOLS.length} Active</p>
+            <p className="text-[11px] text-slate-500 mt-0.5 font-mono">Tags, Links, AI & IDs</p>
           </div>
           <div className="p-3 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200">
             <Wrench className="w-6 h-6" />

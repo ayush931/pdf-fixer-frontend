@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/useApp';
 import { apiService } from '../../services/apiService';
 import type { LinkViewSetting } from '../../types/pdf';
@@ -16,9 +16,18 @@ import {
   HelpCircle,
   Layers,
   Sparkles,
+  Link2,
+  FileType,
+  Eraser,
+  ShieldAlert,
+  Wand2,
+  Layout,
+  Search,
+  Sliders,
+  Filter,
 } from 'lucide-react';
 
-interface ToolConfig {
+export interface ToolConfig {
   id: string;
   name: string;
   category: string;
@@ -27,7 +36,7 @@ interface ToolConfig {
   outputSuffix: string;
 }
 
-const TOOLS: ToolConfig[] = [
+export const TOOLS: ToolConfig[] = [
   {
     id: 'fix_note_ids',
     name: 'Fix Note IDs',
@@ -35,6 +44,14 @@ const TOOLS: ToolConfig[] = [
     icon: FileCode,
     description: 'Scans PDF note anchor tags and assigns unique, non-colliding object IDs.',
     outputSuffix: '_fixed_note_ids.pdf',
+  },
+  {
+    id: 'fix_reference_note_ids',
+    name: 'Fix Reference Note IDs',
+    category: 'Identifiers & Tags',
+    icon: Link2,
+    description: 'Repairs citations and cross-references pointing to target Note IDs across the document.',
+    outputSuffix: '_fixed_ref_notes.pdf',
   },
   {
     id: 'tag_viewer',
@@ -47,15 +64,23 @@ const TOOLS: ToolConfig[] = [
   {
     id: 'fix_index_tag',
     name: 'Fix Index Pages Tagging',
-    category: 'Accessibility & Tags',
+    category: 'Accessibility & Index',
     icon: BookOpenCheck,
     description: 'Remediates auto-tagged index pages, binding table of content items correctly.',
     outputSuffix: '_fixed_index.pdf',
   },
   {
+    id: 'tag_index_phrases',
+    name: 'Tag Index Phrases (Robust)',
+    category: 'Accessibility & Index',
+    icon: FileType,
+    description: 'Tags index pages keeping multi-word phrases unified with separate locator links.',
+    outputSuffix: '_indexed_phrases.pdf',
+  },
+  {
     id: 'apply_link_view_settings',
     name: 'Link View & Zoom Settings',
-    category: 'View & Navigation',
+    category: 'Navigation & Zoom',
     icon: ZoomIn,
     description: 'Enforces uniform PDF destination zoom modes (Fit, FitH, InheritZoom, etc.).',
     outputSuffix: '_fixed_view_settings.pdf',
@@ -63,7 +88,7 @@ const TOOLS: ToolConfig[] = [
   {
     id: 'fix_links',
     name: 'Repair Broken Links',
-    category: 'Navigation',
+    category: 'Navigation & Zoom',
     icon: Link,
     description: 'Detects and repairs internal document hyperlinks pointing to missing page targets.',
     outputSuffix: '_fixed_links.pdf',
@@ -76,19 +101,65 @@ const TOOLS: ToolConfig[] = [
     description: 'Generates two-way hyperlinks between main text citations and endnotes/footnotes.',
     outputSuffix: '_bidirectional_linked.pdf',
   },
+  {
+    id: 'remove_page_ids',
+    name: 'Strip Page ID Tags',
+    category: 'Structure Cleanup',
+    icon: Eraser,
+    description: 'Strips page ID attributes (/ID) from structure tree elements to prevent validation conflicts.',
+    outputSuffix: '_fixed_page_ids.pdf',
+  },
+  {
+    id: 'id_remover_strip',
+    name: 'Audit & Strip Structure /IDs',
+    category: 'Structure Cleanup',
+    icon: ShieldAlert,
+    description: 'Discovers and selectively strips auto-generated /ID attributes and clusters from structure tree.',
+    outputSuffix: '_stripped_ids.pdf',
+  },
+  {
+    id: 'auto_tagger',
+    name: 'Auto-Tag PDF (PDF/UA Engine)',
+    category: 'Advanced AI & Tags',
+    icon: Wand2,
+    description: 'Converts untagged PDF into fully accessible PDF/UA-compliant tagged document with heading & table detection.',
+    outputSuffix: '_auto_tagged.pdf',
+  },
+  {
+    id: 'structure_analyzer',
+    name: 'Document Structure Analyzer',
+    category: 'Advanced AI & Tags',
+    icon: Layout,
+    description: 'Inspects heading hierarchy, multi-column flows, and visual blocks for reading order mapping.',
+    outputSuffix: '_structure_report.json',
+  },
+];
+
+const CATEGORIES = [
+  'All',
+  'Identifiers & Tags',
+  'Accessibility & Index',
+  'Navigation & Zoom',
+  'Structure Cleanup',
+  'Advanced Links',
+  'Advanced AI & Tags',
+  'Inspection & Logs',
 ];
 
 export const RemediationTools: React.FC = () => {
-  const { files, activeFile, setActiveFile, refreshTasks, setActiveTab, addToast, selectedToolId, setSelectedToolId } = useApp();
+  const { files, activeFile, setActiveFile, refreshTasks, setActiveTab, addToast, selectedToolId, setSelectedToolId, setSelectedFileForInspector } = useApp();
 
   const [mode, setMode] = useState<'single' | 'multi'>('single');
   const [activeToolId, setActiveToolId] = useState<string>(selectedToolId || 'fix_note_ids');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedMultiToolIds, setSelectedMultiToolIds] = useState<string[]>(['fix_note_ids', 'fix_links']);
   const [submitting, setSubmitting] = useState<boolean>(false);
+  const [inspectingIds, setInspectingIds] = useState<boolean>(false);
 
   // Form States
   const [outputName, setOutputName] = useState<string>('');
   const [indexPages, setIndexPages] = useState<string>('6, 7, 8');
+  const [phraseIndexPages, setPhraseIndexPages] = useState<string>('');
   const [viewPreset, setViewPreset] = useState<LinkViewSetting>('InheritZoom');
   const [customView, setCustomView] = useState<string>('');
   const [notesPages, setNotesPages] = useState<string>('');
@@ -98,7 +169,24 @@ export const RemediationTools: React.FC = () => {
   const [dryRun, setDryRun] = useState<boolean>(false);
   const [verbose, setVerbose] = useState<boolean>(true);
 
+  // ID Remover States
+  const [idStripPattern, setIdStripPattern] = useState<string>('^[A-Za-z0-9]+-[A-Za-z0-9.-]+$');
+  const [idStripTagFilter, setIdStripTagFilter] = useState<string>('Link,P');
+  const [idStripClusters, setIdStripClusters] = useState<string>('');
+  const [idStripAuto, setIdStripAuto] = useState<boolean>(false);
+  const [idStripPrune, setIdStripPrune] = useState<boolean>(false);
+  const [idStripDryRun, setIdStripDryRun] = useState<boolean>(false);
+
+  // Auto-Tagger States
+  const [autoTaggerVerbose, setAutoTaggerVerbose] = useState<boolean>(true);
+
   const selectedSingleTool = TOOLS.find((t) => t.id === activeToolId) || TOOLS[0];
+
+  useEffect(() => {
+    if (selectedToolId && selectedToolId !== activeToolId) {
+      setActiveToolId(selectedToolId);
+    }
+  }, [selectedToolId, activeToolId]);
 
   const defaultOutputName = activeFile
     ? `${activeFile.filename.replace(/\.pdf$/i, '')}${selectedSingleTool.outputSuffix || '_fixed.pdf'}`
@@ -115,8 +203,6 @@ export const RemediationTools: React.FC = () => {
     }
   };
 
-
-
   const toggleMultiTool = (toolId: string) => {
     setSelectedMultiToolIds((prev) =>
       prev.includes(toolId) ? prev.filter((id) => id !== toolId) : [...prev, toolId]
@@ -131,6 +217,8 @@ export const RemediationTools: React.FC = () => {
     switch (toolId) {
       case 'fix_note_ids':
         return apiService.processNoteIds({ file_id: fileId, output_name: finalOutput });
+      case 'fix_reference_note_ids':
+        return apiService.processReferenceNoteIds({ file_id: fileId, output_name: finalOutput });
       case 'tag_viewer':
         return apiService.processTagViewer({ file_id: fileId });
       case 'fix_index_tag': {
@@ -138,7 +226,14 @@ export const RemediationTools: React.FC = () => {
           .split(',')
           .map((p) => parseInt(p.trim(), 10))
           .filter((p) => !isNaN(p) && p > 0);
-        return apiService.processIndexTags({ file_id: fileId, pages: pagesList, output_name: finalOutput });
+        return apiService.processIndexTags({ file_id: fileId, pages: pagesList.length > 0 ? pagesList : undefined, output_name: finalOutput });
+      }
+      case 'tag_index_phrases': {
+        const pagesList = phraseIndexPages
+          .split(',')
+          .map((p) => parseInt(p.trim(), 10))
+          .filter((p) => !isNaN(p) && p > 0);
+        return apiService.processTagIndexPhrases({ file_id: fileId, pages: pagesList.length > 0 ? pagesList : undefined, output_name: finalOutput });
       }
       case 'apply_link_view_settings':
         return apiService.processLinkView({
@@ -160,8 +255,45 @@ export const RemediationTools: React.FC = () => {
           verbose: verbose,
           output_name: finalOutput,
         });
+      case 'remove_page_ids':
+        return apiService.processRemovePageIds({ file_id: fileId, output_name: finalOutput });
+      case 'id_remover_strip':
+        return apiService.processIdRemoverStrip({
+          file_id: fileId,
+          output_name: finalOutput,
+          pattern: idStripPattern.trim() || undefined,
+          tag_filter: idStripTagFilter.trim() || undefined,
+          clusters: idStripClusters.trim() || undefined,
+          auto: idStripAuto,
+          prune_empty_nodes: idStripPrune,
+          dry_run: idStripDryRun,
+        });
+      case 'auto_tagger':
+        return apiService.processAutoTagger({
+          file_id: fileId,
+          output_name: finalOutput,
+          verbose: autoTaggerVerbose,
+        });
+      case 'structure_analyzer':
+        return apiService.processStructureAnalysis(fileId);
       default:
         throw new Error(`Unknown tool ID ${toolId}`);
+    }
+  };
+
+  const handleRunIdInspect = async () => {
+    if (!activeFile) return;
+    setInspectingIds(true);
+    try {
+      const res = await apiService.processIdRemoverInspect({ file_id: activeFile.id });
+      addToast('info', 'ID Audit Discovery Queued', `Task ID: ${res.task_id.slice(0, 8)}... started.`);
+      await refreshTasks();
+      setActiveTab('tasks');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to start ID inspection';
+      addToast('error', 'Audit Failed', msg);
+    } finally {
+      setInspectingIds(false);
     }
   };
 
@@ -212,6 +344,11 @@ export const RemediationTools: React.FC = () => {
       setSubmitting(false);
     }
   };
+
+  const filteredTools = TOOLS.filter((t) => {
+    if (selectedCategory === 'All') return true;
+    return t.category === selectedCategory;
+  });
 
   return (
     <div className="space-y-6">
@@ -285,6 +422,27 @@ export const RemediationTools: React.FC = () => {
         </div>
       </div>
 
+      {/* Category Filter Tabs */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+        <div className="flex items-center gap-1 text-slate-500 font-bold px-2 shrink-0">
+          <Filter className="w-3.5 h-3.5 text-slate-400" /> Filter:
+        </div>
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-colors ${
+              selectedCategory === cat
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'bg-slate-200/70 hover:bg-slate-300 text-slate-700 border border-slate-300'
+            }`}
+          >
+            {cat} {cat === 'All' ? `(${TOOLS.length})` : ''}
+          </button>
+        ))}
+      </div>
+
       {/* Multi-Tool Batch Mode Banner */}
       {mode === 'multi' && (
         <div className="p-4 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-between gap-4 text-indigo-900">
@@ -306,8 +464,8 @@ export const RemediationTools: React.FC = () => {
       )}
 
       {/* Tools Grid Selection Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-        {TOOLS.map((tool) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+        {filteredTools.map((tool) => {
           const Icon = tool.icon;
           const isSelected =
             mode === 'single' ? activeToolId === tool.id : selectedMultiToolIds.includes(tool.id);
@@ -349,7 +507,7 @@ export const RemediationTools: React.FC = () => {
                       />
                     )}
                     <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-600 border border-slate-300">
-                      {tool.category}
+                      {tool.category.split(' ')[0]}
                     </span>
                   </div>
                 </div>
@@ -399,7 +557,7 @@ export const RemediationTools: React.FC = () => {
           </div>
 
           {/* Single Mode Output Name */}
-          {mode === 'single' && selectedSingleTool.id !== 'tag_viewer' && (
+          {mode === 'single' && selectedSingleTool.id !== 'tag_viewer' && selectedSingleTool.id !== 'structure_analyzer' && (
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Output PDF Filename</label>
               <input
@@ -407,14 +565,13 @@ export const RemediationTools: React.FC = () => {
                 value={effectiveOutputName}
                 onChange={(e) => setOutputName(e.target.value)}
                 placeholder="e.g. remediated_document.pdf"
-
                 className="w-full px-4 py-2.5 text-xs bg-slate-200/50 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
                 required
               />
             </div>
           )}
 
-          {/* Config Section 1: Fix Index Tag */}
+          {/* Config Section: Fix Index Tag */}
           {(mode === 'single' ? activeToolId === 'fix_index_tag' : selectedMultiToolIds.includes('fix_index_tag')) && (
             <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-2">
               <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -426,17 +583,36 @@ export const RemediationTools: React.FC = () => {
                 type="text"
                 value={indexPages}
                 onChange={(e) => setIndexPages(e.target.value)}
-                placeholder="e.g. 6, 7, 8"
+                placeholder="e.g. 6, 7, 8 (or leave empty for all pages)"
                 className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
-                required
               />
               <p className="text-[11px] text-slate-500">
-                1-indexed comma-separated list of page numbers containing index links (e.g. 6, 7, 8).
+                1-indexed comma-separated list of page numbers to fix index links (e.g. 6, 7, 8).
               </p>
             </div>
           )}
 
-          {/* Config Section 2: Link View Settings */}
+          {/* Config Section: Tag Index Phrases */}
+          {(mode === 'single' ? activeToolId === 'tag_index_phrases' : selectedMultiToolIds.includes('tag_index_phrases')) && (
+            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-2">
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <FileType className="w-4 h-4 text-indigo-600" />
+                Tag Index Phrases (Robust Multi-Column Mode)
+              </label>
+              <input
+                type="text"
+                value={phraseIndexPages}
+                onChange={(e) => setPhraseIndexPages(e.target.value)}
+                placeholder="e.g. 215, 216, 217 (or leave blank to process all pages)"
+                className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+              />
+              <p className="text-[11px] text-slate-500">
+                Keeps phrases ("data - base", "hello, world") unified in a single tag while creating distinct link tags for numbers.
+              </p>
+            </div>
+          )}
+
+          {/* Config Section: Link View Settings */}
           {(mode === 'single' ? activeToolId === 'apply_link_view_settings' : selectedMultiToolIds.includes('apply_link_view_settings')) && (
             <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-3">
               <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -474,7 +650,7 @@ export const RemediationTools: React.FC = () => {
             </div>
           )}
 
-          {/* Config Section 3: Bidirectional Notes Linker */}
+          {/* Config Section: Bidirectional Notes Linker */}
           {(mode === 'single' ? activeToolId === 'bidirectional_notes_linker' : selectedMultiToolIds.includes('bidirectional_notes_linker')) && (
             <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-4">
               <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -553,6 +729,138 @@ export const RemediationTools: React.FC = () => {
             </div>
           )}
 
+          {/* Config Section: Audit & Strip Structure /IDs */}
+          {(mode === 'single' ? activeToolId === 'id_remover_strip' : selectedMultiToolIds.includes('id_remover_strip')) && (
+            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-300 pb-3">
+                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <ShieldAlert className="w-4 h-4 text-indigo-600" />
+                  Structure /ID Stripping & Audit Options
+                </h4>
+                <button
+                  type="button"
+                  onClick={handleRunIdInspect}
+                  disabled={inspectingIds}
+                  className="px-3 py-1.5 text-xs font-bold rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                  title="Scan PDF and inventory all /ID shapes into a structured JSON report"
+                >
+                  <Search className="w-3.5 h-3.5" />
+                  <span>{inspectingIds ? 'Auditing /IDs...' : 'Run Audit Discovery (Inspect)'}</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700">Matching Regex Pattern</label>
+                  <input
+                    type="text"
+                    value={idStripPattern}
+                    onChange={(e) => setIdStripPattern(e.target.value)}
+                    placeholder="e.g. ^[A-Za-z0-9]+-[A-Za-z0-9.-]+$"
+                    className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700">Tag Type Filter</label>
+                  <input
+                    type="text"
+                    value={idStripTagFilter}
+                    onChange={(e) => setIdStripTagFilter(e.target.value)}
+                    placeholder="e.g. Link,P"
+                    className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700">Cluster Indices (Optional)</label>
+                  <input
+                    type="text"
+                    value={idStripClusters}
+                    onChange={(e) => setIdStripClusters(e.target.value)}
+                    placeholder="e.g. 1,2"
+                    className="w-full px-4 py-2 text-xs bg-slate-100 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 font-mono font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={idStripAuto}
+                    onChange={(e) => setIdStripAuto(e.target.checked)}
+                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                  />
+                  Auto-Clean Mode (Producer Noise)
+                </label>
+
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={idStripPrune}
+                    onChange={(e) => setIdStripPrune(e.target.checked)}
+                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                  />
+                  Prune Empty /IDTree Nodes
+                </label>
+
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={idStripDryRun}
+                    onChange={(e) => setIdStripDryRun(e.target.checked)}
+                    className="rounded text-indigo-600 focus:ring-indigo-500"
+                  />
+                  Dry Run (Audit Report Only)
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Config Section: Auto-Tagger */}
+          {(mode === 'single' ? activeToolId === 'auto_tagger' : selectedMultiToolIds.includes('auto_tagger')) && (
+            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-3">
+              <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Wand2 className="w-4 h-4 text-indigo-600" />
+                Auto-Tagging (PDF/UA Standard Engine) Settings
+              </h4>
+              <p className="text-xs text-slate-600">
+                Analyzes document heading hierarchy, paragraphs, table cells, lists, and marked content sequences for accessibility compliance.
+              </p>
+              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 border border-slate-300 text-xs font-semibold text-slate-800 cursor-pointer w-fit">
+                <input
+                  type="checkbox"
+                  checked={autoTaggerVerbose}
+                  onChange={(e) => setAutoTaggerVerbose(e.target.checked)}
+                  className="rounded text-indigo-600 focus:ring-indigo-500"
+                />
+                Enable Verbose Tagging Diagnostics Logs
+              </label>
+            </div>
+          )}
+
+          {/* Config Section: Structure Analyzer */}
+          {mode === 'single' && activeToolId === 'structure_analyzer' && (
+            <div className="p-4 rounded-xl bg-slate-200/40 border border-slate-300 space-y-3">
+              <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Layout className="w-4 h-4 text-indigo-600" />
+                Document Structure & Reading Flow Analyzer
+              </h4>
+              <p className="text-xs text-slate-600">
+                You can run structure analysis here or view the interactive visual drag-and-drop mapping directly in the PDF Inspector modal.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSelectedFileForInspector(activeFile)}
+                className="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors flex items-center gap-1.5 w-fit"
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                <span>Open Visual Reading Order Mapper</span>
+              </button>
+            </div>
+          )}
+
           {/* Action Button */}
           <div className="pt-4 flex justify-end">
             <button
@@ -563,9 +871,9 @@ export const RemediationTools: React.FC = () => {
               <Play className="w-4 h-4 fill-white" />
               <span>
                 {submitting
-                  ? 'Enqueueing Celery Tasks...'
+                  ? 'Enqueueing Background Tasks...'
                   : mode === 'single'
-                  ? 'Run Remediation Tool'
+                  ? `Run ${selectedSingleTool.name}`
                   : `Run Selected (${selectedMultiToolIds.length}) Tools in Parallel`}
               </span>
             </button>

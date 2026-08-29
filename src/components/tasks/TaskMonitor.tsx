@@ -29,6 +29,21 @@ export const TaskMonitor: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/* Ephemeral Privacy Notice Banner */}
+      <div className="p-3.5 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-between gap-3 text-indigo-900 text-xs shadow-2xs">
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 rounded-lg bg-indigo-600 text-white shrink-0">
+            <CheckCircle2 className="w-4 h-4" />
+          </div>
+          <div>
+            <span className="font-bold text-indigo-950">Ephemeral Privacy Lifecycle Active:</span>
+            <span className="text-indigo-800 ml-1">
+              Input and output PDFs are processed temporarily and purged automatically from server storage after task completion / download.
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Top Toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
