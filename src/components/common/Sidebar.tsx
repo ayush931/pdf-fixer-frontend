@@ -1,11 +1,39 @@
 import React from 'react';
 import { useApp } from '../../context/useApp';
-import { Files, Wrench, Terminal, FileText, Eye, UploadCloud, Activity, Database, Network } from 'lucide-react';
+import { Files, Wrench, Terminal, FileText, Eye, UploadCloud, Activity, Database, Network, Tag } from 'lucide-react';
 import { formatFileSize } from '../../utils/formatters';
 import { TOOLS } from '../tools/RemediationTools';
 
 export const Sidebar: React.FC = () => {
   const { activeTab, setActiveTab, files, tasks, activeFile, setSelectedFileForInspector, systemHealth } = useApp();
+  const [sidebarWidth, setSidebarWidth] = React.useState<number>(() => {
+    const saved = localStorage.getItem('app_sidebar_width');
+    return saved ? Math.max(180, Math.min(480, parseInt(saved, 10))) : 256;
+  });
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = sidebarWidth;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const newWidth = Math.max(180, Math.min(480, startWidth + (moveEvent.clientX - startX)));
+      setSidebarWidth(newWidth);
+      localStorage.setItem('app_sidebar_width', newWidth.toString());
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
 
   const pendingCount = tasks.filter(
     (t) => t.status === 'PENDING' || t.status === 'RUNNING' || t.status === 'QUEUED'
@@ -18,6 +46,13 @@ export const Sidebar: React.FC = () => {
       description: 'Upload & inspect PDFs',
       icon: Files,
       count: files.length,
+    },
+    {
+      id: 'tags' as const,
+      label: 'Tag Tree & PAC',
+      description: 'Adobe & PAC inspector',
+      icon: Tag,
+      count: null,
     },
     {
       id: 'tools' as const,
@@ -37,8 +72,11 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="hidden md:flex md:flex-col justify-between w-64 h-full bg-white border-r border-slate-200/80 shrink-0 p-4 overflow-y-auto">
-      <div className="space-y-5">
+    <aside
+      style={{ width: `${sidebarWidth}px` }}
+      className="hidden md:flex md:flex-col justify-between h-full bg-white border-r border-slate-200/80 shrink-0 relative select-none"
+    >
+      <div className="flex-1 p-4 overflow-y-auto space-y-5">
         <div className="px-2">
           <h2 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
             Navigation
@@ -194,6 +232,15 @@ export const Sidebar: React.FC = () => {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Draggable Resizer Bar on right edge */}
+      <div
+        onMouseDown={handleMouseDown}
+        className="absolute top-0 right-0 w-1.5 h-full hover:bg-blue-500 active:bg-blue-600 cursor-col-resize z-40 transition-colors flex items-center justify-center group"
+        title="Drag to resize Navigation Sidebar"
+      >
+        <div className="w-0.5 h-8 bg-slate-300 group-hover:bg-white rounded-full transition-colors" />
       </div>
     </aside>
   );

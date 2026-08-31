@@ -1,4 +1,5 @@
 import React from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { useApp } from './context/useApp';
 import { Header } from './components/common/Header';
@@ -7,9 +8,11 @@ import { ToastStack } from './components/common/Toast';
 import { FileUploadZone } from './components/files/FileUploadZone';
 import { FileListTable } from './components/files/FileListTable';
 import { PdfInspectorModal } from './components/files/PdfInspectorModal';
+import { PdfTagTreeInspector } from './components/tags/PdfTagTreeInspector';
 import { RemediationTools, TOOLS } from './components/tools/RemediationTools';
 import { TaskMonitor } from './components/tasks/TaskMonitor';
 import { TaskLogModal } from './components/tasks/TaskLogModal';
+import { LoginPage } from './components/auth/LoginPage';
 import { Files, Wrench, ShieldCheck, Zap } from 'lucide-react';
 
 const MainContent: React.FC = () => {
@@ -118,21 +121,61 @@ const MainContent: React.FC = () => {
   );
 };
 
-export function App() {
-  return (
-    <AppProvider>
-      <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-slate-800 font-sans selection:bg-orange-600 selection:text-white">
-        <Header />
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-          <Sidebar />
-          <MainContent />
-        </div>
+const AppLayout: React.FC = () => {
+  const { activeTab } = useApp();
+
+  if (activeTab === 'tags') {
+    return (
+      <div className="h-screen w-screen flex flex-col bg-white overflow-hidden select-none">
+        <PdfTagTreeInspector isStandaloneFullPage={true} />
+        <PdfInspectorModal />
+        <TaskLogModal />
         <ToastStack />
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-slate-800 font-sans selection:bg-orange-600 selection:text-white">
+      <Header />
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+        <Sidebar />
+        <MainContent />
+      </div>
+      <ToastStack />
+    </div>
+  );
+};
+
+const AuthenticatedApp: React.FC = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center space-y-3 font-sans">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600" />
+        <p className="text-xs font-semibold text-slate-500">Checking authentication session...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
+  return (
+    <AppProvider>
+      <AppLayout />
     </AppProvider>
+  );
+};
+
+export function App() {
+  return (
+    <AuthProvider>
+      <AuthenticatedApp />
+    </AuthProvider>
   );
 }
 
 export default App;
-
-

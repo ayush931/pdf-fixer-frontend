@@ -40,4 +40,9 @@ export const ENDPOINTS = {
     TASKS: `${API_BASE_URL}/api/tasks`,
     TASK_STATUS: (taskId: string) => `${API_BASE_URL}/api/tasks/${taskId}`,
     HEALTH: `${API_BASE_URL}/api/health`,
+
+    AUTH_REGISTER: `${API_BASE_URL}/api/auth/register`,
+    AUTH_LOGIN: `${API_BASE_URL}/api/auth/login`,
+    AUTH_ME: `${API_BASE_URL}/api/auth/me`,
+    AUTH_LOGOUT: `${API_BASE_URL}/api/auth/logout`,
 };

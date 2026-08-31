@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/useApp';
-import { FileCheck2, Cpu, Activity, ExternalLink, RefreshCw, Trash2, Menu, X, Files, Wrench, Terminal } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { FileCheck2, Cpu, Activity, ExternalLink, RefreshCw, Trash2, Menu, X, Files, Wrench, Terminal, ChevronDown, LogOut, ShieldCheck } from 'lucide-react';
 import { TOOLS } from '../tools/RemediationTools';
 
 export const Header: React.FC = () => {
   const { tasks, files, refreshFiles, refreshTasks, loadingFiles, loadingTasks, clearAllBackendData, activeTab, setActiveTab } = useApp();
+  const { user, logout } = useAuth();
   const [showConfirmClear, setShowConfirmClear] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const activeTaskCount = tasks.filter(
     (t) => t.status === 'PENDING' || t.status === 'RUNNING' || t.status === 'QUEUED'
@@ -102,6 +105,53 @@ export const Header: React.FC = () => {
             <span>API Docs</span>
             <ExternalLink className="w-3 h-3 opacity-70" />
           </a>
+
+          {/* User Profile & Sign Out Dropdown */}
+          {user && (
+            <div className="relative ml-1">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-2 pl-2 pr-3 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+                title="Account Settings"
+              >
+                <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                  {user.username.charAt(0).toUpperCase()}
+                </div>
+                <div className="text-left hidden sm:block">
+                  <div className="text-xs font-bold text-slate-800 leading-none">{user.username}</div>
+                  <div className="text-[9px] font-mono text-slate-400 capitalize">{user.role}</div>
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              </button>
+
+              {userMenuOpen && (
+                <div
+                  className="absolute right-0 top-10 bg-white rounded-xl shadow-xl border border-slate-200 p-3 w-56 z-50 space-y-2.5"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="border-b border-slate-100 pb-2">
+                    <div className="font-bold text-xs text-slate-900">{user.full_name || user.username}</div>
+                    <div className="text-[11px] text-slate-400 truncate">{user.email}</div>
+                    <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 capitalize">
+                      <ShieldCheck className="w-2.5 h-2.5" />
+                      {user.role} Account
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={async () => {
+                      setUserMenuOpen(false);
+                      await logout();
+                    }}
+                    className="w-full py-1.5 px-2.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-rose-600" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </header>
 

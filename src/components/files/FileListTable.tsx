@@ -13,6 +13,7 @@ import {
   Download,
   Filter,
   Wrench,
+  Tag
 } from 'lucide-react';
 
 export const FileListTable: React.FC = () => {
@@ -189,10 +190,23 @@ export const FileListTable: React.FC = () => {
                         className="flex items-center justify-end gap-1.5"
                         onClick={(e) => e.stopPropagation()}
                       >
+                        {/* Full-Screen Tag Tree & PAC Inspector */}
+                        <button
+                          onClick={() => {
+                            setActiveFile(file);
+                            setActiveTab('tags');
+                          }}
+                          className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-colors flex items-center gap-1 shadow-2xs cursor-pointer"
+                          title="Open Full Screen Tag Tree & PAC Inspector"
+                        >
+                          <Tag className="w-3 h-3 text-blue-600" />
+                          <span>Tags & PAC</span>
+                        </button>
+
                         {/* Inspect Button */}
                         <button
                           onClick={() => setSelectedFileForInspector(file)}
-                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
+                          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors cursor-pointer"
                           title="Inspect Document Structure & Bookmarks"
                         >
                           <Eye className="w-3.5 h-3.5" />

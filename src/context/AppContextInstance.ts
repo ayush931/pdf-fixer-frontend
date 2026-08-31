@@ -20,8 +20,8 @@ export interface AppContextType {
   setSelectedTaskForLogs: (task: Task | null) => void;
   selectedFileForInspector: PdfFile | null;
   setSelectedFileForInspector: (file: PdfFile | null) => void;
-  activeTab: 'files' | 'tools' | 'tasks';
-  setActiveTab: (tab: 'files' | 'tools' | 'tasks') => void;
+  activeTab: 'files' | 'tools' | 'tasks' | 'tags';
+  setActiveTab: (tab: 'files' | 'tools' | 'tasks' | 'tags') => void;
   selectedToolId: string | null;
   setSelectedToolId: (toolId: string | null) => void;
   toasts: ToastMessage[];

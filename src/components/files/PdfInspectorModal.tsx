@@ -4,15 +4,16 @@ import { apiService } from '../../services/apiService';
 import type { PdfPagesInfo } from '../../types/pdf';
 import { Modal } from '../common/Modal';
 import { LoadingSpinner } from '../common/LoadingSpinner';
-import { FileText, Bookmark, Search, Eye, BookOpen, Layers, CheckCircle2, ListOrdered } from 'lucide-react';
+import { FileText, Bookmark, Search, Eye, BookOpen, Layers, CheckCircle2, ListOrdered, Tag } from 'lucide-react';
 import { formatFileSize } from '../../utils/formatters';
 import { ReadingOrderMapper } from './ReadingOrderMapper';
+import { PdfTagTreeInspector } from '../tags/PdfTagTreeInspector';
 
 export const PdfInspectorModal: React.FC = () => {
   const { selectedFileForInspector, setSelectedFileForInspector } = useApp();
   const [info, setInfo] = useState<PdfPagesInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'outline' | 'search' | 'preview' | 'reading-order'>('outline');
+  const [activeTab, setActiveTab] = useState<'outline' | 'search' | 'preview' | 'reading-order' | 'tags'>('tags');
   const [searchQuery, setSearchQuery] = useState<string>('index');
   const [filterText, setFilterText] = useState<string>('');
 
@@ -66,6 +67,18 @@ export const PdfInspectorModal: React.FC = () => {
       {/* Navigation Sub-Tabs */}
       <div className="flex flex-wrap items-center justify-between border-b border-slate-200 pb-3 gap-2">
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setActiveTab('tags')}
+            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors ${
+              activeTab === 'tags'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            <Tag className="w-3.5 h-3.5 text-blue-500" />
+            Tags Tree & PAC
+          </button>
+
           <button
             onClick={() => setActiveTab('outline')}
             className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors ${
@@ -235,6 +248,13 @@ export const PdfInspectorModal: React.FC = () => {
                   title="PDF Preview"
                   className="w-full h-full border-none"
                 />
+              </div>
+            )}
+
+            {/* TAGS TREE & PAC INSPECTOR TAB */}
+            {activeTab === 'tags' && (
+              <div className="w-full h-[600px] rounded-xl overflow-hidden border border-slate-200 bg-white shadow-2xs flex flex-col">
+                <PdfTagTreeInspector initialFile={file} />
               </div>
             )}
 

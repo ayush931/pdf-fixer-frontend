@@ -11,7 +11,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeFile, setActiveFile] = useState<PdfFile | null>(null);
   const [selectedTaskForLogs, setSelectedTaskForLogs] = useState<Task | null>(null);
   const [selectedFileForInspector, setSelectedFileForInspector] = useState<PdfFile | null>(null);
-  const [activeTab, setActiveTab] = useState<'files' | 'tools' | 'tasks'>('files');
+  const [activeTab, setActiveTab] = useState<'files' | 'tools' | 'tasks' | 'tags'>('files');
   const [selectedToolId, setSelectedToolId] = useState<string | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
