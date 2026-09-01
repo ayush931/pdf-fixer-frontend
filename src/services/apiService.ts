@@ -17,6 +17,8 @@ import type {
   IdRemoverInspectRequest,
   IdRemoverStripRequest,
   AutoTaggerRequest,
+  SetLinkObjrRequest,
+  TagUntaggedIndexRequest,
   ReorderReadingOrderRequest,
   SystemHealth,
 } from '../types/pdf';
@@ -308,6 +310,24 @@ class ApiService {
 
   async processAutoTagger(req: AutoTaggerRequest): Promise<TaskEnqueueResponse> {
     const res = await fetch(ENDPOINTS.PROCESS_AUTO_TAGGER, {
+      method: 'POST',
+      headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(req),
+    });
+    return this.handleResponse<TaskEnqueueResponse>(res);
+  }
+
+  async processSetLinkObjr(req: SetLinkObjrRequest): Promise<TaskEnqueueResponse> {
+    const res = await fetch(ENDPOINTS.PROCESS_SET_LINK_OBJR, {
+      method: 'POST',
+      headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(req),
+    });
+    return this.handleResponse<TaskEnqueueResponse>(res);
+  }
+
+  async processTagUntaggedIndex(req: TagUntaggedIndexRequest): Promise<TaskEnqueueResponse> {
+    const res = await fetch(ENDPOINTS.PROCESS_TAG_UNTAGGED_INDEX, {
       method: 'POST',
       headers: this.getAuthHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(req),

@@ -25,6 +25,7 @@ import {
   Search,
   Sliders,
   Filter,
+  ArrowUpDown,
 } from 'lucide-react';
 
 export interface ToolConfig {
@@ -38,6 +39,22 @@ export interface ToolConfig {
 
 export const TOOLS: ToolConfig[] = [
   {
+    id: 'set_link_objr',
+    name: 'Set /OBJR Link References',
+    category: 'Navigation & Zoom',
+    icon: Link2,
+    description: 'Embeds /OBJR dictionaries in <Link> structure elements (1st in /K), linking annotations with /ParentTree for PDF/UA ISO 14289-1 compliance.',
+    outputSuffix: '_fixed_link_objr.pdf',
+  },
+  {
+    id: 'tag_untagged_index',
+    name: 'Tag Untagged Index Pages',
+    category: 'Accessibility & Index',
+    icon: BookOpenCheck,
+    description: 'Converts untagged multi-column index pages into accessible PDF/UA structure with separate <Link> tags for locators without visual distortion.',
+    outputSuffix: '_tagged_index.pdf',
+  },
+  {
     id: 'fix_note_ids',
     name: 'Fix Note IDs',
     category: 'Identifiers & Tags',
@@ -49,7 +66,7 @@ export const TOOLS: ToolConfig[] = [
     id: 'fix_reference_note_ids',
     name: 'Fix Reference Note IDs',
     category: 'Identifiers & Tags',
-    icon: Link2,
+    icon: Link,
     description: 'Repairs citations and cross-references pointing to target Note IDs across the document.',
     outputSuffix: '_fixed_ref_notes.pdf',
   },
@@ -65,7 +82,7 @@ export const TOOLS: ToolConfig[] = [
     id: 'fix_index_tag',
     name: 'Fix Index Pages Tagging',
     category: 'Accessibility & Index',
-    icon: BookOpenCheck,
+    icon: FileType,
     description: 'Remediates auto-tagged index pages, binding table of content items correctly.',
     outputSuffix: '_fixed_index.pdf',
   },
@@ -73,7 +90,7 @@ export const TOOLS: ToolConfig[] = [
     id: 'tag_index_phrases',
     name: 'Tag Index Phrases (Robust)',
     category: 'Accessibility & Index',
-    icon: FileType,
+    icon: FileText,
     description: 'Tags index pages keeping multi-word phrases unified with separate locator links.',
     outputSuffix: '_indexed_phrases.pdf',
   },
@@ -133,6 +150,14 @@ export const TOOLS: ToolConfig[] = [
     description: 'Inspects heading hierarchy, multi-column flows, and visual blocks for reading order mapping.',
     outputSuffix: '_structure_report.json',
   },
+  {
+    id: 'reorder_reading_order',
+    name: 'Reorder Reading Order',
+    category: 'Advanced AI & Tags',
+    icon: ArrowUpDown,
+    description: 'Applies logical sequence adjustments to structure tree elements and coordinates visual reading order.',
+    outputSuffix: '_reordered.pdf',
+  },
 ];
 
 const CATEGORIES = [
@@ -150,9 +175,9 @@ export const RemediationTools: React.FC = () => {
   const { files, activeFile, setActiveFile, refreshTasks, setActiveTab, addToast, selectedToolId, setSelectedToolId, setSelectedFileForInspector } = useApp();
 
   const [mode, setMode] = useState<'single' | 'multi'>('single');
-  const [activeToolId, setActiveToolId] = useState<string>(selectedToolId || 'fix_note_ids');
+  const [activeToolId, setActiveToolId] = useState<string>(selectedToolId || 'set_link_objr');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [selectedMultiToolIds, setSelectedMultiToolIds] = useState<string[]>(['fix_note_ids', 'fix_links']);
+  const [selectedMultiToolIds, setSelectedMultiToolIds] = useState<string[]>(['set_link_objr', 'fix_note_ids', 'fix_links']);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [inspectingIds, setInspectingIds] = useState<boolean>(false);
 
@@ -160,6 +185,9 @@ export const RemediationTools: React.FC = () => {
   const [outputName, setOutputName] = useState<string>('');
   const [indexPages, setIndexPages] = useState<string>('6, 7, 8');
   const [phraseIndexPages, setPhraseIndexPages] = useState<string>('');
+  const [untaggedIndexPages, setUntaggedIndexPages] = useState<string>('');
+  const [untaggedIndexDebug, setUntaggedIndexDebug] = useState<boolean>(false);
+  const [setObjrVerbose, setSetObjrVerbose] = useState<boolean>(true);
   const [viewPreset, setViewPreset] = useState<LinkViewSetting>('InheritZoom');
   const [customView, setCustomView] = useState<string>('');
   const [notesPages, setNotesPages] = useState<string>('');
@@ -273,6 +301,29 @@ export const RemediationTools: React.FC = () => {
           file_id: fileId,
           output_name: finalOutput,
           verbose: autoTaggerVerbose,
+        });
+      case 'set_link_objr':
+        return apiService.processSetLinkObjr({
+          file_id: fileId,
+          output_name: finalOutput,
+          verbose: setObjrVerbose,
+        });
+      case 'tag_untagged_index': {
+        const pagesList = untaggedIndexPages.trim()
+          ? untaggedIndexPages.split(',').map((p) => p.trim()).filter(Boolean)
+          : undefined;
+        return apiService.processTagUntaggedIndex({
+          file_id: fileId,
+          output_name: finalOutput,
+          pages: pagesList,
+          debug: untaggedIndexDebug,
+        });
+      }
+      case 'reorder_reading_order':
+        return apiService.processReorderReadingOrder({
+          file_id: fileId,
+          output_name: finalOutput,
+          custom_order: {},
         });
       case 'structure_analyzer':
         return apiService.processStructureAnalysis(fileId);
@@ -857,6 +908,84 @@ export const RemediationTools: React.FC = () => {
               >
                 <Sliders className="w-3.5 h-3.5" />
                 <span>Open Visual Reading Order Mapper</span>
+              </button>
+            </div>
+          )}
+
+          {/* Config Section: Set Link OBJR */}
+          {(mode === 'single' ? activeToolId === 'set_link_objr' : selectedMultiToolIds.includes('set_link_objr')) && (
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Link2 className="w-4 h-4 text-slate-700" />
+                Set /OBJR Link References (PDF/UA ISO 14289-1 Standard)
+              </h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Walks the PDF structure tree and all page link annotations to ensure that every interactive Link annotation (/Subtype /Link) is properly linked to its corresponding &lt;Link&gt; structure element via an Object Reference dictionary (/Type /OBJR), placed 1st in /K, with exact matching /Rect and ParentTree keys.
+              </p>
+              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 cursor-pointer w-fit">
+                <input
+                  type="checkbox"
+                  checked={setObjrVerbose}
+                  onChange={(e) => setSetObjrVerbose(e.target.checked)}
+                  className="rounded text-orange-600 focus:ring-orange-500 accent-orange-600"
+                />
+                Enable Verbose Execution Diagnostics
+              </label>
+            </div>
+          )}
+
+          {/* Config Section: Tag Untagged Index Pages */}
+          {(mode === 'single' ? activeToolId === 'tag_untagged_index' : selectedMultiToolIds.includes('tag_untagged_index')) && (
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <BookOpenCheck className="w-4 h-4 text-slate-700" />
+                Tag Untagged Index Pages (Multi-Column Layout & Locators)
+              </h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Creates accessible PDF/UA structure tags and interactive &lt;Link&gt; structure elements for untagged index pages dynamically without shifting visual layout or fonts, slicing native operand byte sequences with 0.000000 pt delta.
+              </p>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-700">Index Pages Range (Optional)</label>
+                <input
+                  type="text"
+                  value={untaggedIndexPages}
+                  onChange={(e) => setUntaggedIndexPages(e.target.value)}
+                  placeholder="e.g. 215-221 or 215, 216, 217 (leave blank for all pages)"
+                  className="w-full px-3.5 py-2 text-xs bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-orange-500 font-mono font-medium"
+                />
+                <p className="text-[11px] text-slate-400">
+                  Specify page numbers or ranges to process (1-indexed). Leave blank to auto-detect and process.
+                </p>
+              </div>
+              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 cursor-pointer w-fit">
+                <input
+                  type="checkbox"
+                  checked={untaggedIndexDebug}
+                  onChange={(e) => setUntaggedIndexDebug(e.target.checked)}
+                  className="rounded text-orange-600 focus:ring-orange-500 accent-orange-600"
+                />
+                Enable Debug Detailed Diagnostics
+              </label>
+            </div>
+          )}
+
+          {/* Config Section: Reorder Reading Order */}
+          {mode === 'single' && activeToolId === 'reorder_reading_order' && (
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <ArrowUpDown className="w-4 h-4 text-slate-700" />
+                Reorder Document Reading Order
+              </h4>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Applies custom or sequential reading order mapping to tagged PDF logical structure tree. Use the interactive Visual Reading Order Mapper to rearrange visual blocks visually.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSelectedFileForInspector(activeFile)}
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-colors flex items-center gap-1.5 w-fit shadow-2xs cursor-pointer"
+              >
+                <Sliders className="w-3.5 h-3.5" />
+                <span>Launch Interactive Reading Order Mapper</span>
               </button>
             </div>
           )}

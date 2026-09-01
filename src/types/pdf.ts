@@ -34,6 +34,10 @@ export type TaskName =
     | 'run_id_remover_strip'
     | 'auto_tagger'
     | 'run_auto_tagger'
+    | 'set_link_objr'
+    | 'run_set_link_objr'
+    | 'tag_untagged_index'
+    | 'run_tag_untagged_index'
     | 'document_structure_analyzer'
     | 'run_document_structure_analyzer'
     | 'reorder_reading_order'
@@ -167,6 +171,19 @@ export interface AutoTaggerRequest {
     file_id: string;
     output_name?: string;
     verbose?: boolean;
+}
+
+export interface SetLinkObjrRequest {
+    file_id: string;
+    output_name?: string;
+    verbose?: boolean;
+}
+
+export interface TagUntaggedIndexRequest {
+    file_id: string;
+    output_name?: string;
+    pages?: (number | string)[];
+    debug?: boolean;
 }
 
 export interface ReorderReadingOrderRequest {

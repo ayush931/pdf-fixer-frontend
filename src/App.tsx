@@ -1,5 +1,4 @@
 import React from 'react';
-import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { useApp } from './context/useApp';
 import { Header } from './components/common/Header';
@@ -12,7 +11,6 @@ import { PdfTagTreeInspector } from './components/tags/PdfTagTreeInspector';
 import { RemediationTools, TOOLS } from './components/tools/RemediationTools';
 import { TaskMonitor } from './components/tasks/TaskMonitor';
 import { TaskLogModal } from './components/tasks/TaskLogModal';
-import { LoginPage } from './components/auth/LoginPage';
 import { Files, Wrench, ShieldCheck, Zap } from 'lucide-react';
 
 const MainContent: React.FC = () => {
@@ -147,34 +145,11 @@ const AppLayout: React.FC = () => {
   );
 };
 
-const AuthenticatedApp: React.FC = () => {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center space-y-3 font-sans">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600" />
-        <p className="text-xs font-semibold text-slate-500">Checking authentication session...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <LoginPage />;
-  }
-
+export function App() {
   return (
     <AppProvider>
       <AppLayout />
     </AppProvider>
-  );
-};
-
-export function App() {
-  return (
-    <AuthProvider>
-      <AuthenticatedApp />
-    </AuthProvider>
   );
 }
 

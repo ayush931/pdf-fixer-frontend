@@ -34,6 +34,8 @@ export const ENDPOINTS = {
     PROCESS_ID_REMOVER_INSPECT: `${API_BASE_URL}/api/process/id-remover/inspect`,
     PROCESS_ID_REMOVER_STRIP: `${API_BASE_URL}/api/process/id-remover/strip`,
     PROCESS_AUTO_TAGGER: `${API_BASE_URL}/api/process/auto-tagger`,
+    PROCESS_SET_LINK_OBJR: `${API_BASE_URL}/api/process/set-link-objr`,
+    PROCESS_TAG_UNTAGGED_INDEX: `${API_BASE_URL}/api/process/tag-untagged-index`,
     PROCESS_STRUCTURE_ANALYSIS: `${API_BASE_URL}/api/process/structure-analyzer`,
     PROCESS_REORDER_READING_ORDER: `${API_BASE_URL}/api/process/reorder-reading-order`,
 
