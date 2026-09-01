@@ -1492,7 +1492,7 @@ const FastDecoupledCanvas = React.memo<{
 
     let isCurrent = true;
 
-    pdfDoc.getPage(pageNum).then((page) => {
+    pdfDoc.getPage(pageNum).then((page: any) => {
       if (!isCurrent) return;
       const renderScale = Math.max(1.35, zoomScale * 1.35);
       const viewport = page.getViewport({ scale: renderScale, rotation });
